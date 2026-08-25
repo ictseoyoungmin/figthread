@@ -1,32 +1,34 @@
 {
   "schema_version": "figthread.figure/0.1",
-  "id": "fig:example",
+  "id": "fig:minimal-pipeline",
   "profile": "technical-explainer",
   "figure_type": "pipeline",
   "thesis_claim_id": "claim:primary",
   "claims": [
-    {
-      "id": "claim:primary",
-      "role": "primary",
-      "text": "The input follows an explicit sequence to the result.",
-      "must_preserve": true
-    }
+    { "id": "claim:primary", "role": "primary", "statement": "A request moves through a deterministic processing pipeline.", "source_refs": ["source:prompt"], "must_preserve": true },
+    { "id": "claim:queue", "role": "supporting", "statement": "The queue makes intermediate state explicit.", "source_refs": ["source:prompt"] }
   ],
   "nodes": [
-    { "id": "node:input", "kind": "stage", "label": "Input", "claim_refs": ["claim:primary"], "order": 0 },
-    { "id": "node:result", "kind": "result", "label": "Result", "claim_refs": ["claim:primary"], "order": 1 }
+    { "id": "node:root", "kind": "panel", "label": "Processing pipeline", "claim_refs": ["claim:primary"] },
+    { "id": "node:input", "kind": "stage", "label": "Input", "parent_id": "node:root", "claim_refs": ["claim:primary"], "order": 0 },
+    { "id": "node:queue", "kind": "state", "label": "Queue", "parent_id": "node:root", "claim_refs": ["claim:queue"], "order": 1 },
+    { "id": "node:output", "kind": "result", "label": "Output", "parent_id": "node:root", "claim_refs": ["claim:primary"], "order": 2 }
   ],
   "relations": [
-    { "id": "relation:main", "kind": "flows-to", "from": "node:input", "to": "node:result", "claim_refs": ["claim:primary"] }
+    { "id": "relation:input-queue", "kind": "flows-to", "from": "node:input", "to": "node:queue", "claim_refs": ["claim:primary"] },
+    { "id": "relation:queue-output", "kind": "flows-to", "from": "node:queue", "to": "node:output", "claim_refs": ["claim:primary"] }
   ],
-  "states": [],
+  "states": [
+    { "id": "state:queue-count", "target_id": "node:queue", "property": "occupancy", "domain": { "type": "count", "min": 0, "max": 4, "unit": "items" }, "initial": 0, "summary": 1, "claim_refs": ["claim:queue"] }
+  ],
   "composition": {
-    "grammar": { "type": "pipeline", "version": "0.1", "variant": "linear", "reading_axis": "left-right" },
-    "root_id": "node:input",
-    "order": ["node:input", "node:result"]
+    "grammar": { "type": "pipeline", "version": "0.1", "variant": "linear", "reading_axis": "left-right", "role_bindings": { "stages": ["node:input", "node:queue", "node:output"] } },
+    "root_id": "node:root",
+    "order": ["node:input", "node:queue", "node:output"]
   },
+  "emphasis": { "primary": ["node:input", "node:output"], "secondary": ["node:queue"], "muted": [] },
   "snapshots": [
-    { "id": "snapshot:summary", "kind": "summary", "state_values": {} }
+    { "id": "snapshot:summary", "kind": "summary", "state_values": { "state:queue-count": 1 } }
   ],
   "static_snapshot_id": "snapshot:summary",
   "extensions": {}

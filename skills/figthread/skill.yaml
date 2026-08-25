@@ -2,22 +2,26 @@ schema: hadara.skill/v0.1
 name: figthread
 version: 0.1.0
 description: >-
-  Design and validate semantic figures and deterministic explanatory motion
-  artifacts from claims, data, papers, and system concepts.
+  Design and validate semantic figures through the FigureSpec structural and
+  semantic promotion gate.
 entry:
   skill: SKILL.md
 resources:
   templates: templates/
   references: references/
   assets: assets/
+  schemas: schemas/
+  runtime: runtime/
+  scripts: scripts/
+  examples: examples/
 compatibility:
   agents: [Claude Code, Codex CLI]
   os: [windows, linux, macos]
 interface:
   display_name: "Figthread"
-  short_description: "Design semantic figures with deterministic motion"
+  short_description: "Design semantic figures with deterministic validation"
   icon_small: "./assets/icon.svg"
   icon_large: "./assets/icon.svg"
-  default_prompt: "Use $figthread to design, validate, and package a publication-ready semantic figure or explanatory motion artifact."
+  default_prompt: "Use $figthread to author and gate a semantic FigureSpec before downstream figure work."
 policy:
   allow_implicit_invocation: true

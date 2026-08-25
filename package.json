@@ -6,10 +6,9 @@
   "type": "module",
   "scripts": {
     "test": "node --test",
-    "validate": "node src/cli.js"
+    "validate": "node skills/figthread/scripts/validate.mjs",
+    "validate:promote": "node skills/figthread/scripts/validate.mjs --promote"
   },
-  "engines": {
-    "node": ">=20"
-  },
+  "engines": { "node": ">=20" },
   "license": "MIT"
 }
