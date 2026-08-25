@@ -1,38 +1,40 @@
 # LayoutIntent and deterministic layout
 
-Layout consumes only a promoted `validated_figure` with a valid promotion receipt. Raw `FigureSpec` input is never authoritative layout input.
+Layout consumes only matching promoted semantic and primitive artifacts. Raw semantic input and hand-authored node measurements are not authoritative layout inputs.
 
 ## Authority boundary
 
 - `FigureSpec` owns semantic identity, relations, composition order, and reading-axis intent.
-- `LayoutRequest` supplies one explicit target and intrinsic node measurements.
+- `PrimitivePlan` owns resolved primitive bindings and intrinsic node measurements.
+- The layout target supplies one explicit viewport, profile, safe area, and solver options.
 - `LayoutIntent` owns target, regions, hard/strong/soft constraints, allowed ports, and routing policy. It contains no resolved `x/y/path` geometry.
 - `ResolvedLayout` owns boxes, anchors, connector points/path, diagnostics, and `layout_hash`.
 - Renderer code must consume `ResolvedLayout`; it must not invent alternate placement.
 
-Intrinsic measurements are explicit inputs to the current layout runtime. Treat declared minimum/preferred sizes as authoritative for the solve; do not infer replacements from browser or renderer CSS.
+The layout engine still has an internal measurement bridge, but agent-facing authoring does not supply it. The promoted primitive plan is the only valid source for those intrinsic metrics.
 
 ## Determinism
 
-The current engine supports `left-right` and `top-down` dominant axes. It deliberately does not use force-directed or stochastic layout. The same promoted figure, normalized intrinsic measurements, target, options, and engine version must produce the same `LayoutIntent` and `ResolvedLayout` hashes.
+The current engine supports `left-right` and `top-down` dominant axes. It deliberately does not use force-directed or stochastic layout. The same promoted figure, promoted primitive plan, target, options, and engine version must produce the same `LayoutIntent` and `ResolvedLayout` hashes.
 
-Intrinsic measurements are normalized by `node_id` before hashing, so measurement array order is not authoritative.
+Visual identity is carried into `LayoutIntent` and `ResolvedLayout` through `visual_hash`, `primitive_registry_hash`, and `primitive_plan_hash`. Changing a primitive binding therefore changes layout identity even when two primitives happen to share the same intrinsic dimensions.
 
 ## Solve order
 
-1. verify the semantic promotion receipt and canonical figure hash;
-2. validate `LayoutRequest` target, safe area, measurements, and options;
-3. compile grammar/composition into `LayoutIntent` regions and constraints;
-4. compute recursive intrinsic footprints;
-5. place children in stable reading order;
-6. reduce soft gap before shrinking preferred size toward declared minimum;
-7. refuse a solve if any minimum size cannot fit;
-8. freeze boxes and anchors;
-9. route relations orthogonally using stable candidate scoring;
-10. audit overflow, unrelated box collision, obstacle penetration, and crossing budget;
-11. hash and promote only with zero hard errors.
+1. verify semantic and primitive promotion receipts and matching figure hashes;
+2. validate the target viewport, profile, safe area, and options;
+3. derive normalized intrinsic measurements from the promoted primitive plan;
+4. compile grammar/composition into `LayoutIntent` regions and constraints;
+5. compute recursive intrinsic footprints;
+6. place children in stable reading order;
+7. reduce soft gap before shrinking preferred size toward declared minimum;
+8. refuse a solve if any minimum size cannot fit;
+9. freeze boxes and anchors;
+10. route relations orthogonally using stable candidate scoring;
+11. audit overflow, unrelated box collision, obstacle penetration, and crossing budget;
+12. bind visual/registry/plan hashes into the final layout identity and promote only with zero hard errors.
 
-No text or font size is silently reduced by the layout runtime. `min_w/min_h` are hard intrinsic floors supplied by the measurement owner.
+No text or font size is silently reduced by the layout runtime. Primitive `min_w/min_h` values are hard intrinsic floors. Profile-owned text measurement may strengthen those floors later but may not weaken them.
 
 ## Routing
 
@@ -40,7 +42,7 @@ Relations keep their semantic `from/to` from `FigureSpec`. The router chooses ac
 
 ## Diagnostics
 
-- `LAY001_UNSAT` — invalid request, invalid promoted input, unsupported axis, or hard minimum geometry cannot fit.
+- `LAY001_UNSAT` — invalid target, invalid promoted input, unsupported axis, primitive-plan mismatch, or hard minimum geometry cannot fit.
 - `LAY003_OVERFLOW` — box or connector path leaves the target safe area.
 - `LAY004_COLLISION` — unrelated semantic boxes overlap or a route penetrates a semantic obstacle.
 - `LAY005_ROUTE_DENSE` — crossing budget exceeded.
@@ -50,8 +52,8 @@ Relations keep their semantic `from/to` from `FigureSpec`. The router chooses ac
 
 ## Unsupported operations
 
-The installed runtime does not provide topology-specific radial solving, automatic visual-primitive measurement, profile-owned font measurement, SVG rendering, or export. When a request depends on an unavailable capability, preserve the semantic/layout authority boundary and fail explicitly rather than using a stochastic, browser-driven, or hand-positioned fallback.
+The installed runtime does not provide topology-specific radial solving, profile-owned font measurement, final SVG rendering, or export. When a request depends on an unavailable capability, preserve the semantic/visual/layout authority boundary and fail explicitly rather than using a stochastic, browser-driven, or hand-positioned fallback.
 
 ## Recovery rule
 
-Repair `LAY` failures at their owning layout or upstream semantic cause. Do not compensate for an invalid `ResolvedLayout` with renderer CSS, manual SVG offsets, or alternate DOM geometry.
+Repair `LAY` failures at their owning layout, visual, or upstream semantic cause. Do not compensate for an invalid `ResolvedLayout` with renderer CSS, manual SVG offsets, alternate DOM geometry, or ad-hoc replacement measurements.
