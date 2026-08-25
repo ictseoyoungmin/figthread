@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.6.0 — D-006 deterministic static SVG rendering
+
+- added a deterministic standalone SVG renderer that consumes only promoted semantic, primitive, profile, and layout authority
+- added deterministic core drawing implementations for all 24 bundled primitive families
+- added static-summary state projection into state-aware primitives such as queues and meters
+- reused promoted connector routes exactly and kept global geometry outside renderer authority
+- added rendered-profile evidence for explicit emitted font size, essential stroke width, contrast, grayscale policy, node/connector coverage, and SVG purity
+- added content hashes for SVG, rendered artifact, evidence, and immutable render promotion receipts
+- added fail-closed custom primitive evidence rules and explicit browser-glyph-extent limitation reporting
+- added skill-local render CLI with SVG/evidence file output
+- added renderer/runtime mirrors, agent-facing rendering reference, CI gate, and regression coverage
+
 ## 0.5.0 — D-005 profile thresholds
 
 - added a content-hashed five-profile threshold registry
