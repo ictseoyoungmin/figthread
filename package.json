@@ -1,13 +1,15 @@
 {
   "name": "figthread",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
-  "description": "Semantic figure authoring, deterministic layout, and semantic motion foundation for Figthread.",
+  "description": "Semantic figure authoring, primitive-bound visual authority, deterministic layout, and semantic motion foundation for Figthread.",
   "type": "module",
   "scripts": {
     "test": "node --test",
     "validate": "node skills/figthread/scripts/validate.mjs",
     "validate:promote": "node skills/figthread/scripts/validate.mjs --promote",
+    "visual": "node skills/figthread/scripts/visual.mjs",
+    "visual:promote": "node skills/figthread/scripts/visual.mjs --promote",
     "layout": "node skills/figthread/scripts/layout.mjs",
     "layout:promote": "node skills/figthread/scripts/layout.mjs --promote",
     "motion": "node skills/figthread/scripts/motion.mjs",
