@@ -1,6 +1,6 @@
-# FigureSpec 0.1 — D-001 contract
+# FigureSpec 0.1 contract
 
-`FigureSpec` is the canonical semantic IR that must pass both structural and semantic validation before layout can consume it. Resolved geometry never belongs here.
+`FigureSpec` is the canonical semantic IR. It must pass structural and semantic validation before layout can consume it. Resolved geometry never belongs here.
 
 ## Required top-level fields
 
@@ -21,7 +21,7 @@ EmphasisSpec { primary, secondary, muted }
 
 1. **Structural schema** — `schemas/figure-spec.schema.json` owns required fields, enums, types, patterns, and unknown-key policy.
 2. **Core semantic validator** — owns reference integrity, claim reachability, parent/root correctness, domains, snapshots, geometry exclusion, and extension rules.
-3. Later grammar/profile validators may add stricter rules but cannot weaken D-001.
+3. **Grammar/profile validators** — may add stricter rules for a selected grammar or target profile, but may not weaken the core semantic contract.
 
 ## Core invariants
 
@@ -39,6 +39,10 @@ Structural problems use `SCH001`. Issues are deterministically ordered by severi
 
 ## Modes and promotion
 
-`draft` and `gate` both report the same structural/semantic defects. Draft mode is non-authoritative and can be used while authoring. Only a zero-error `gate` report has `promotion_eligible: true`.
+`draft` and `gate` both report structural and semantic defects. Draft mode is non-authoritative and may be used while authoring. Only a zero-error `gate` report has `promotion_eligible: true`.
 
 `promoteFigureSpec()` returns a deeply frozen `validated_figure` snapshot plus a content-hashed promotion receipt. Downstream layout must consume only a gate-promoted snapshot.
+
+## Recovery rule
+
+When validation fails, repair the semantic source of the issue and re-run the gate. Do not add geometry, renderer-specific state, or downstream patches to make invalid semantic state appear acceptable.

@@ -8,43 +8,64 @@ description: >-
 
 # Figthread
 
-Figure first, motion second. D-001 establishes semantic authority; D-002 establishes deterministic geometry authority. No downstream renderer or motion work may bypass either promotion gate.
+Figure first, motion second.
+
+Semantic figure state must be validated and promoted before layout. Deterministic layout must be validated and promoted before any consumer treats geometry as authoritative. Do not bypass an upstream promotion gate.
 
 ## Required reading
 
-For D-001 read `references/figure-ir.md`, `schemas/figure-spec.schema.json`, and `templates/figure-spec.json`.
-Before D-002 also read `references/layout-resolution.md`, `schemas/layout-request.schema.json`, and `templates/layout-request.json`.
+Before semantic authoring, read:
 
-## D-001 workflow
+1. `references/figure-ir.md`
+2. `schemas/figure-spec.schema.json`
+3. `templates/figure-spec.json`
 
-1. Understand source provenance, audience, target profile, exclusions, and primary question.
-2. Extract claims and author FigureSpec 0.1.
+Before deterministic layout, also read:
+
+1. `references/layout-resolution.md`
+2. `schemas/layout-request.schema.json`
+3. `templates/layout-request.json`
+
+Read `references/motion-ir.md` only when working with semantic motion contracts. Do not assume motion compilation or rendering capabilities that are not present in the installed runtime.
+
+## Semantic authoring and promotion
+
+1. Understand source provenance, audience, target profile, exclusions, and the primary question.
+2. Extract claims and author `FigureSpec 0.1`.
 3. Run `node <skill-root>/scripts/validate.mjs <figure-spec.json> --mode gate`.
-4. Repair semantic causes until zero errors, then run the same command with `--promote`.
-5. Only the promoted `validated_figure` is authoritative downstream.
+4. Repair semantic causes until the gate reports zero errors.
+5. Run the same command with `--promote`.
+6. Treat only the promoted `validated_figure` as semantic authority downstream.
 
-## D-002 workflow
+## Deterministic layout and promotion
 
-1. Start from the D-001 promoted FigureSpec; never layout a raw document.
-2. Choose one target viewport/profile/safe area.
-3. Supply intrinsic min/preferred measurements for every non-root semantic node. This bridge remains explicit until later VisualSpec/primitive/profile slices own measurement.
+1. Start from a promoted `validated_figure`; never lay out a raw semantic document.
+2. Choose one explicit target viewport, profile, and safe area.
+3. Supply intrinsic minimum/preferred measurements for every non-root semantic node. These measurements are explicit layout inputs and must not be invented by renderer CSS.
 4. Run `node <skill-root>/scripts/layout.mjs <figure-spec.json> <layout-request.json> --mode gate`.
-5. Repair LAY failures at their layout/upstream cause; do not compensate in renderer CSS.
+5. Repair `LAY` failures at their layout or upstream semantic cause; do not compensate with downstream CSS patches.
 6. Promote with `node <skill-root>/scripts/layout.mjs <figure-spec.json> <layout-request.json> --promote`.
-7. Pass only the promoted `ResolvedLayout` to future rendering/motion work.
+7. Treat only the promoted `ResolvedLayout` as geometry authority.
+
+## Authority model
+
+- `FigureSpec` owns meaning.
+- `LayoutIntent` owns target, regions, constraints, ports, and routing policy.
+- `ResolvedLayout` owns actual boxes, anchors, and connector geometry.
+- Semantic relations remain in `FigureSpec`; the router chooses anchors and paths only after boxes freeze.
+- Browser or CSS auto-layout is never canonical geometry.
+- View/runtime state must not silently mutate promoted semantic or layout state.
 
 ## Non-negotiables
 
-- FigureSpec owns meaning. LayoutIntent owns constraints/regions/ports. ResolvedLayout owns actual geometry.
-- LayoutIntent must not contain resolved x/y/path geometry.
-- Same promoted figure + normalized measurements + target + options + engine version => same layout hash.
-- Minimum intrinsic dimensions are hard floors. Reduce soft gaps/preferred sizes first; fail rather than shrink below minimum.
-- No force-directed or stochastic fallback exists in D-002.
-- Connector semantics remain in FigureSpec; router chooses actual anchors/path only after boxes freeze.
-- Browser/CSS auto-layout is never canonical geometry.
-- Draft mode is non-authoritative. Only gate promotion unlocks the next slice.
+- `LayoutIntent` must not contain resolved `x/y/path` geometry.
+- Same promoted figure + normalized measurements + target + options + engine version must produce the same layout hash.
+- Minimum intrinsic dimensions are hard floors. Reduce soft gaps and preferred sizes first; fail rather than shrink below minimum.
+- Force-directed and stochastic layout are not allowed fallbacks.
+- Draft mode is non-authoritative. Only gate promotion unlocks downstream authority.
 - Resolve `<skill-root>` from this installed skill; never substitute the user's project npm scripts.
+- If a requested topology or capability is unsupported by the installed runtime, fail explicitly or reopen the appropriate upstream decision. Do not fabricate geometry or claim an unavailable capability.
 
-## Current slice boundary
+## Current runtime capabilities
 
-D-002 supports deterministic left-right and top-down base solving. Radial/topology-specific grammar adapters, VisualSpec, primitive measurement, profile font floors, text reflow, MotionSpec, SVG rendering, and export remain later slices.
+The installed layout runtime supports deterministic left-right and top-down base solving with explicit intrinsic measurements and orthogonal routing. Unsupported topology-specific solving must fail closed rather than fall back to stochastic placement.

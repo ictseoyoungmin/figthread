@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.1 — agent-facing boundary cleanup
+
+- removed internal roadmap codes and implementation-slice language from `skills/figthread/`
+- rewrote the installed skill around stable capability, authority, promotion, recovery, and unsupported-operation contracts
+- added a recursive regression test that forbids `D-*` roadmap codes anywhere under the installed skill tree
+- documented that roadmap codes belong only in repository-level developer materials
+
 ## 0.2.0 — D-002 deterministic layout
 
 - added LayoutRequest 0.1, LayoutIntent 0.1, and ResolvedLayout 0.1 contracts

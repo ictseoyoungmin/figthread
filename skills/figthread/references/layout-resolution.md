@@ -1,26 +1,28 @@
-# D-002 — LayoutIntent and deterministic layout
+# LayoutIntent and deterministic layout
 
-D-002 consumes only a D-001 `validated_figure` with a valid promotion receipt. Raw FigureSpec input is never authoritative layout input.
+Layout consumes only a promoted `validated_figure` with a valid promotion receipt. Raw `FigureSpec` input is never authoritative layout input.
 
 ## Authority boundary
 
 - `FigureSpec` owns semantic identity, relations, composition order, and reading-axis intent.
-- `LayoutRequest` supplies one explicit target and intrinsic node measurements. Measurements are an input bridge until VisualSpec/primitive/profile measurement slices own them.
+- `LayoutRequest` supplies one explicit target and intrinsic node measurements.
 - `LayoutIntent` owns target, regions, hard/strong/soft constraints, allowed ports, and routing policy. It contains no resolved `x/y/path` geometry.
 - `ResolvedLayout` owns boxes, anchors, connector points/path, diagnostics, and `layout_hash`.
 - Renderer code must consume `ResolvedLayout`; it must not invent alternate placement.
 
+Intrinsic measurements are explicit inputs to the current layout runtime. Treat declared minimum/preferred sizes as authoritative for the solve; do not infer replacements from browser or renderer CSS.
+
 ## Determinism
 
-The v0.1 engine supports `left-right` and `top-down` dominant axes. It deliberately does not use force-directed or stochastic layout. The same promoted figure, normalized intrinsic measurements, target, options, and engine version must produce the same LayoutIntent and ResolvedLayout hashes.
+The current engine supports `left-right` and `top-down` dominant axes. It deliberately does not use force-directed or stochastic layout. The same promoted figure, normalized intrinsic measurements, target, options, and engine version must produce the same `LayoutIntent` and `ResolvedLayout` hashes.
 
-Intrinsic measurements are normalized by `node_id` before hashing, so array order is not authority.
+Intrinsic measurements are normalized by `node_id` before hashing, so measurement array order is not authoritative.
 
 ## Solve order
 
-1. verify D-001 promotion receipt and canonical figure hash;
-2. validate LayoutRequest target, safe area, measurements, and options;
-3. compile grammar/composition into LayoutIntent regions and constraints;
+1. verify the semantic promotion receipt and canonical figure hash;
+2. validate `LayoutRequest` target, safe area, measurements, and options;
+3. compile grammar/composition into `LayoutIntent` regions and constraints;
 4. compute recursive intrinsic footprints;
 5. place children in stable reading order;
 6. reduce soft gap before shrinking preferred size toward declared minimum;
@@ -30,11 +32,11 @@ Intrinsic measurements are normalized by `node_id` before hashing, so array orde
 10. audit overflow, unrelated box collision, obstacle penetration, and crossing budget;
 11. hash and promote only with zero hard errors.
 
-No text/font size is silently reduced by this slice. `min_w/min_h` are hard intrinsic floors supplied by the measurement owner.
+No text or font size is silently reduced by the layout runtime. `min_w/min_h` are hard intrinsic floors supplied by the measurement owner.
 
 ## Routing
 
-Relations keep their semantic `from/to` from FigureSpec. The router chooses actual east/west or north/south anchors after box placement. Candidate paths are scored by semantic obstacle hits, crossings against already-routed relations, bends, length, then deterministic candidate order.
+Relations keep their semantic `from/to` from `FigureSpec`. The router chooses actual east/west or north/south anchors after box placement. Candidate paths are scored by semantic obstacle hits, crossings against already-routed relations, bends, length, then deterministic candidate order.
 
 ## Diagnostics
 
@@ -44,8 +46,12 @@ Relations keep their semantic `from/to` from FigureSpec. The router chooses actu
 - `LAY005_ROUTE_DENSE` — crossing budget exceeded.
 - `LAY008_TARGET_MISSING` — target is missing, malformed, or profile-incompatible.
 
-D-002 reserves `LAY002`, `LAY006`, and `LAY007` for later font/reflow/manual-patch integrations already defined by the design baseline.
+`LAY002`, `LAY006`, and `LAY007` are reserved protocol codes and must not be repurposed by local patches.
 
-## Scope boundary
+## Unsupported operations
 
-This slice does not implement VisualSpec, primitive intrinsic measurement, profile font floors, grammar-specific radial topology, MotionSpec, SVG rendering, or export. Those later slices may replace the explicit `measurements` bridge, but must preserve the LayoutIntent/ResolvedLayout authority boundary and deterministic promotion contract.
+The installed runtime does not provide topology-specific radial solving, automatic visual-primitive measurement, profile-owned font measurement, SVG rendering, or export. When a request depends on an unavailable capability, preserve the semantic/layout authority boundary and fail explicitly rather than using a stochastic, browser-driven, or hand-positioned fallback.
+
+## Recovery rule
+
+Repair `LAY` failures at their owning layout or upstream semantic cause. Do not compensate for an invalid `ResolvedLayout` with renderer CSS, manual SVG offsets, or alternate DOM geometry.
