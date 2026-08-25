@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.4.0 — D-004 visual primitives
+
+- added VisualSpec schema/template/example and skill-local visual CLI
+- added a content-hashed 24-family core primitive registry
+- added custom primitive schema and validation for IDs, variants, intrinsic floors, interfaces, state channels, and SVG purity
+- added S0–S3 salience with custom primitive enforcement for S3 thesis-bearing/novel structure
+- added immutable PrimitivePlan promotion receipts and deterministic plan/measurement hashes
+- moved the agent-facing layout workflow from hand-authored measurements to PrimitivePlan-derived measurements
+- added a public layout-target contract while retaining the old measurement request only as an internal solver bridge
+- bound visual/registry/primitive-plan identity into LayoutIntent and ResolvedLayout hashes
+- routed motion CLI through semantic → visual → layout → motion promotion
+- expanded CI and regression coverage across the full promotion chain
+- extended agent-facing guards to reject version labels for VisualSpec, PrimitiveDefinition, PrimitivePlan, and LayoutTarget
+
 ## 0.3.0 — D-003 deterministic semantic motion
 
 - added MotionSpec schema/template/example and skill-local motion CLI

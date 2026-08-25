@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://figthread.dev/schemas/primitive-definition/0.1",
+  "title": "Figthread PrimitiveDefinition 0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "class", "renderer", "variants", "view_box", "intrinsic", "ports", "slots", "state_channels", "tokens", "local_svg"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^custom\\.[a-z0-9][a-z0-9._-]*@[0-9]+\\.[0-9]+$" },
+    "class": { "type": "string", "enum": ["structural", "semantic", "mechanism"] },
+    "renderer": { "const": "svg" },
+    "variants": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$" } },
+    "view_box": { "type": "array", "minItems": 4, "maxItems": 4, "items": { "type": "number" } },
+    "intrinsic": {
+      "type": "object", "additionalProperties": false,
+      "required": ["min_w", "min_h", "pref_w", "pref_h", "aspect_policy"],
+      "properties": {
+        "min_w": { "type": "number", "minimum": 0.001 },
+        "min_h": { "type": "number", "minimum": 0.001 },
+        "pref_w": { "type": "number", "minimum": 0.001 },
+        "pref_h": { "type": "number", "minimum": 0.001 },
+        "aspect_policy": { "type": "string", "enum": ["free", "fixed", "content"] }
+      }
+    },
+    "ports": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^[a-z][a-z0-9.*:_-]*$" } },
+    "slots": { "type": "array", "items": { "type": "string", "pattern": "^[a-z][a-z0-9.*:_-]*$" } },
+    "state_channels": { "type": "array", "items": { "type": "string", "pattern": "^[a-z][a-z0-9.*:_-]*$" } },
+    "tokens": { "type": "array", "items": { "type": "string", "pattern": "^[a-z][a-z0-9._-]*$" } },
+    "local_svg": { "type": "string", "minLength": 1 }
+  }
+}
