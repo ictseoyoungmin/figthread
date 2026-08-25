@@ -1,8 +1,8 @@
 {
   "name": "figthread",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
-  "description": "Semantic figure authoring, primitive-bound visual authority, profile-strengthened measurement, deterministic layout, and semantic motion foundation for Figthread.",
+  "description": "Semantic figure authoring with promoted visual/profile/layout authority, deterministic SVG rendering, rendered-profile evidence, and semantic motion.",
   "type": "module",
   "scripts": {
     "test": "node --test",
@@ -14,6 +14,8 @@
     "profile:promote": "node skills/figthread/scripts/profile.mjs --promote",
     "layout": "node skills/figthread/scripts/layout.mjs",
     "layout:promote": "node skills/figthread/scripts/layout.mjs --promote",
+    "render": "node skills/figthread/scripts/render.mjs",
+    "render:promote": "node skills/figthread/scripts/render.mjs --promote",
     "motion": "node skills/figthread/scripts/motion.mjs",
     "motion:promote": "node skills/figthread/scripts/motion.mjs --promote"
   },
