@@ -1,0 +1,17 @@
+{
+  "schema_version": "figthread.visual/0.1",
+  "figure_id": "fig:replace-me",
+  "registry_hash": "sha256:51a4be6295cbe6994f7c9af00e512ef25183227161a5ebc91e12d15011cdb684",
+  "bindings": [
+    {
+      "node_id": "node:root",
+      "primitive": "core.frame@0.1",
+      "variant": "panel",
+      "salience": "S0",
+      "props": {},
+      "state_bindings": {}
+    }
+  ],
+  "custom_definitions": [],
+  "extensions": {}
+}
