@@ -15,7 +15,7 @@ const customDefinition=(overrides={})=>({id:"custom.focus-node@0.1",class:"mecha
 
 test("bundled primitive registry identity is stable and matches the visual example",()=>{assert.equal(PRIMITIVE_REGISTRY_HASH,visual.registry_hash);assert.match(PRIMITIVE_REGISTRY_HASH,/^sha256:[0-9a-f]{64}$/);});
 
-test("core primitive registry stays compact at eight families per class",()=>{assert.equal(registry.definitions.length,24);const counts=Object.groupBy(registry.definitions,entry=>entry.class);assert.equal(counts.structural.length,8);assert.equal(counts.semantic.length,8);assert.equal(counts.mechanism.length,8);assert.equal(new Set(registry.definitions.map(entry=>entry.id)).size,24);});
+test("core primitive registry stays compact at eight families per class",()=>{assert.equal(registry.definitions.length,24);const count=(name)=>registry.definitions.filter(entry=>entry.class===name).length;assert.equal(count("structural"),8);assert.equal(count("semantic"),8);assert.equal(count("mechanism"),8);assert.equal(new Set(registry.definitions.map(entry=>entry.id)).size,24);});
 
 test("visual promotion resolves every semantic node and owns intrinsic measurements",()=>{const promoted=promoteVisualSpec(figurePromotion(),visual);assert.equal(promoted.promoted,true);assert.equal(promoted.primitive_plan.bindings.length,figure.nodes.length);assert.deepEqual(promoted.primitive_plan.measurements,[{node_id:"node:input",min_w:100,min_h:60,pref_w:120,pref_h:80},{node_id:"node:output",min_w:100,min_h:60,pref_w:120,pref_h:80},{node_id:"node:queue",min_w:100,min_h:60,pref_w:140,pref_h:80}]);assert.equal(Object.isFrozen(promoted.primitive_plan),true);assert.equal(Object.isFrozen(promoted.validated_visual),true);assert.equal(Object.isFrozen(promoted.promotion_receipt),true);});
 
