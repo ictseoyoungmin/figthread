@@ -1,0 +1,14 @@
+{
+  "name": "figthread",
+  "owner": {
+    "name": "ictseoyoungmin"
+  },
+  "description": "Claude Code marketplace for Figthread.",
+  "plugins": [
+    {
+      "name": "figthread",
+      "source": "./skills/",
+      "description": "Semantic figure authoring and deterministic explanatory motion."
+    }
+  ]
+}

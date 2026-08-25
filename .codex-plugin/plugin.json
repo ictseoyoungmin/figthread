@@ -1,0 +1,30 @@
+{
+  "name": "figthread",
+  "version": "0.1.0",
+  "description": "Design, validate, and package semantic figures with deterministic explanatory motion.",
+  "author": {
+    "name": "ictseoyoungmin",
+    "url": "https://github.com/ictseoyoungmin"
+  },
+  "homepage": "https://github.com/ictseoyoungmin/figthread",
+  "repository": "https://github.com/ictseoyoungmin/figthread",
+  "license": "MIT",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Figthread",
+    "shortDescription": "Design semantic figures with deterministic motion",
+    "longDescription": "A semantic figure authoring skill that turns claims into validated figure IR, readable visual composition, deterministic motion, and lean HTML/SVG artifacts.",
+    "developerName": "ictseoyoungmin",
+    "category": "Developer Tools",
+    "capabilities": ["Instructions", "Visualization", "Validation", "Motion"],
+    "websiteURL": "https://github.com/ictseoyoungmin/figthread",
+    "defaultPrompt": [
+      "Use Figthread for this explanatory figure.",
+      "Turn this claim into a publication-ready semantic figure.",
+      "Validate this figure's semantic structure and motion contract."
+    ],
+    "brandColor": "#B5523A",
+    "composerIcon": "./skills/figthread/assets/icon.svg",
+    "logo": "./skills/figthread/assets/icon.svg"
+  }
+}

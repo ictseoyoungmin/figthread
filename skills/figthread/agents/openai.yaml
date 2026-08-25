@@ -1,0 +1,9 @@
+interface:
+  display_name: "Figthread"
+  short_description: "Design semantic figures with deterministic motion"
+  icon_small: "./assets/icon.svg"
+  icon_large: "./assets/icon.svg"
+  brand_color: "#B5523A"
+  default_prompt: "Use $figthread to design, validate, and package a publication-ready semantic figure or explanatory motion artifact."
+policy:
+  allow_implicit_invocation: true

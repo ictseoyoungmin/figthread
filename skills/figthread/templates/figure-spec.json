@@ -1,0 +1,33 @@
+{
+  "schema_version": "figthread.figure/0.1",
+  "id": "fig:example",
+  "profile": "technical-explainer",
+  "figure_type": "pipeline",
+  "thesis_claim_id": "claim:primary",
+  "claims": [
+    {
+      "id": "claim:primary",
+      "role": "primary",
+      "text": "The input follows an explicit sequence to the result.",
+      "must_preserve": true
+    }
+  ],
+  "nodes": [
+    { "id": "node:input", "kind": "stage", "label": "Input", "claim_refs": ["claim:primary"], "order": 0 },
+    { "id": "node:result", "kind": "result", "label": "Result", "claim_refs": ["claim:primary"], "order": 1 }
+  ],
+  "relations": [
+    { "id": "relation:main", "kind": "flows-to", "from": "node:input", "to": "node:result", "claim_refs": ["claim:primary"] }
+  ],
+  "states": [],
+  "composition": {
+    "grammar": { "type": "pipeline", "version": "0.1", "variant": "linear", "reading_axis": "left-right" },
+    "root_id": "node:input",
+    "order": ["node:input", "node:result"]
+  },
+  "snapshots": [
+    { "id": "snapshot:summary", "kind": "summary", "state_values": {} }
+  ],
+  "static_snapshot_id": "snapshot:summary",
+  "extensions": {}
+}

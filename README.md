@@ -8,6 +8,32 @@ Figthread는 claim에서 semantic figure IR을 거쳐 deterministic한 HTML/SVG 
 - `schemas/figure-spec.schema.json` — `FigureSpec 0.1` 구조 계약
 - `src/validator.js` — structural + core semantic gate의 최소 구현
 - `examples/minimal.figure.json` — 통과하는 최소 FigureSpec
+- `skills/figthread/` — Claude Code/Codex에 설치할 수 있는 스킬 본체와 참조 리소스
+
+## Skill 설치
+
+이 저장소는 `skills/<skill-name>/SKILL.md` 규약을 따르므로 GitHub에 push한 뒤
+Claude Code 또는 Codex에 다음처럼 설치할 수 있습니다.
+
+```bash
+npx skills add ictseoyoungmin/figthread --agent claude-code
+npx skills add ictseoyoungmin/figthread --agent codex
+```
+
+스킬 이름을 명시해야 하는 CLI 버전에서는 다음 형식을 사용합니다.
+
+```bash
+npx skills add ictseoyoungmin/figthread --skill figthread --agent codex
+```
+
+Claude Code marketplace와 Codex plugin metadata도 함께 제공합니다.
+
+- `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`
+- `.codex-plugin/plugin.json`
+- `skills/figthread/agents/openai.yaml`
+
+실제 스킬은 `SKILL.md`와 `references/`, `templates/`, `assets/`만으로
+self-contained하게 동작하고, root의 `src/`·`examples/`·`test/`는 개발/검증용입니다.
 
 ## 시작하기
 
