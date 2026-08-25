@@ -1,0 +1,17 @@
+{
+  "schema_version": "figthread.layout-target/0.1",
+  "target": {
+    "id": "web-wide",
+    "profile": "technical-explainer",
+    "viewport": { "width": 800, "height": 300 },
+    "safe_area": { "top": 20, "right": 20, "bottom": 20, "left": 20 }
+  },
+  "options": {
+    "preferred_gap": 32,
+    "min_gap": 12,
+    "container_padding": 16,
+    "routing_grid": 4,
+    "obstacle_margin": 8,
+    "max_crossings": 4
+  }
+}
