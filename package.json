@@ -1,0 +1,15 @@
+{
+  "name": "figthread",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Semantic figure authoring foundation for Figthread.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "validate": "node src/cli.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT"
+}

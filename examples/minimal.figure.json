@@ -1,0 +1,90 @@
+{
+  "schema_version": "figthread.figure/0.1",
+  "id": "fig:minimal-pipeline",
+  "profile": "technical-explainer",
+  "figure_type": "pipeline",
+  "thesis_claim_id": "claim:primary",
+  "claims": [
+    {
+      "id": "claim:primary",
+      "role": "primary",
+      "text": "A request moves through a deterministic processing pipeline.",
+      "must_preserve": true
+    },
+    {
+      "id": "claim:queue",
+      "role": "supporting",
+      "text": "The queue makes intermediate state explicit."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "node:input",
+      "kind": "stage",
+      "label": "Input",
+      "claim_refs": ["claim:primary"],
+      "order": 0
+    },
+    {
+      "id": "node:queue",
+      "kind": "state",
+      "label": "Queue",
+      "claim_refs": ["claim:queue"],
+      "order": 1
+    },
+    {
+      "id": "node:output",
+      "kind": "result",
+      "label": "Output",
+      "claim_refs": ["claim:primary"],
+      "order": 2
+    }
+  ],
+  "relations": [
+    {
+      "id": "relation:input-queue",
+      "kind": "flows-to",
+      "from": "node:input",
+      "to": "node:queue",
+      "claim_refs": ["claim:primary"]
+    },
+    {
+      "id": "relation:queue-output",
+      "kind": "flows-to",
+      "from": "node:queue",
+      "to": "node:output",
+      "claim_refs": ["claim:primary"]
+    }
+  ],
+  "states": [
+    {
+      "id": "state:queue-count",
+      "target_id": "node:queue",
+      "property": "occupancy",
+      "domain": { "type": "count", "min": 0, "max": 4, "unit": "items" },
+      "initial": 0,
+      "summary": 1,
+      "claim_refs": ["claim:queue"]
+    }
+  ],
+  "composition": {
+    "grammar": {
+      "type": "pipeline",
+      "version": "0.1",
+      "variant": "linear",
+      "reading_axis": "left-right",
+      "role_bindings": { "stages": ["node:input", "node:queue", "node:output"] }
+    },
+    "root_id": "node:input",
+    "order": ["node:input", "node:queue", "node:output"]
+  },
+  "snapshots": [
+    {
+      "id": "snapshot:summary",
+      "kind": "summary",
+      "state_values": { "state:queue-count": 1 }
+    }
+  ],
+  "static_snapshot_id": "snapshot:summary",
+  "extensions": {}
+}

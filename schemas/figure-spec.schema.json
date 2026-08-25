@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://figthread.dev/schemas/figure-spec/0.1",
+  "title": "Figthread FigureSpec 0.1",
+  "description": "Semantic figure IR. Layout geometry is intentionally excluded.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "profile",
+    "figure_type",
+    "thesis_claim_id",
+    "claims",
+    "nodes",
+    "relations",
+    "states",
+    "composition",
+    "snapshots",
+    "static_snapshot_id",
+    "extensions"
+  ],
+  "properties": {
+    "schema_version": { "const": "figthread.figure/0.1" },
+    "id": { "type": "string", "pattern": "^fig:[a-z0-9][a-z0-9._-]*$" },
+    "profile": {
+      "type": "string",
+      "enum": ["paper", "paper-animated", "presentation", "technical-explainer", "infographic"]
+    },
+    "figure_type": {
+      "type": "string",
+      "enum": [
+        "comparison",
+        "architecture",
+        "pipeline",
+        "mechanism",
+        "state-transition",
+        "timeline",
+        "network",
+        "hierarchy",
+        "swimlane",
+        "lifecycle",
+        "dataflow",
+        "multi-panel"
+      ]
+    },
+    "thesis_claim_id": { "type": "string", "pattern": "^claim:[a-z0-9][a-z0-9._-]*$" },
+    "claims": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/claim"
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/node"
+      }
+    },
+    "relations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/relation"
+      }
+    },
+    "states": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/state"
+      }
+    },
+    "composition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["grammar", "root_id"],
+      "properties": {
+        "grammar": { "$ref": "#/$defs/grammar" },
+        "root_id": { "type": "string", "pattern": "^node:[a-z0-9][a-z0-9._-]*$" },
+        "order": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "snapshots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^snapshot:[a-z0-9][a-z0-9._-]*$" },
+          "kind": { "type": "string", "enum": ["summary", "validated_figure", "custom"] },
+          "state_values": { "type": "object" }
+        }
+      }
+    },
+    "static_snapshot_id": { "type": "string", "pattern": "^snapshot:[a-z0-9][a-z0-9._-]*$" },
+    "extensions": { "type": "object", "propertyNames": { "pattern": "^[a-z][a-z0-9.-]*$" } }
+  },
+  "$defs": {
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "role", "text"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^claim:[a-z0-9][a-z0-9._-]*$" },
+        "role": { "type": "string", "enum": ["primary", "supporting", "contrast", "evidence"] },
+        "text": { "type": "string", "minLength": 1 },
+        "must_preserve": { "type": "boolean" },
+        "source_refs": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "claim_refs"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^node:[a-z0-9][a-z0-9._-]*$" },
+        "kind": { "type": "string", "enum": ["panel", "group", "stage", "actor", "object", "process", "state", "metric", "result", "annotation"] },
+        "label": { "type": "string" },
+        "parent_id": { "type": "string", "pattern": "^node:[a-z0-9][a-z0-9._-]*$" },
+        "order": { "type": "integer" },
+        "claim_refs": { "type": "array", "items": { "type": "string", "pattern": "^claim:[a-z0-9][a-z0-9._-]*$" } },
+        "data": { "type": "object" }
+      }
+    },
+    "relation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "from", "to"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^relation:[a-z0-9][a-z0-9._-]*$" },
+        "kind": { "type": "string", "enum": ["flows-to", "routes-to", "transforms-into", "contains", "branches-to", "merges-from", "depends-on", "compares-with", "shares-with", "persists-in", "emits", "consumes", "triggers", "extension"] },
+        "from": { "type": "string", "pattern": "^node:[a-z0-9][a-z0-9._-]*$" },
+        "to": { "type": "string", "pattern": "^node:[a-z0-9][a-z0-9._-]*$" },
+        "claim_refs": { "type": "array", "items": { "type": "string", "pattern": "^claim:[a-z0-9][a-z0-9._-]*$" } },
+        "extension_kind": { "type": "string", "pattern": "^[a-z][a-z0-9.-]*:[a-z][a-z0-9.-]*$" }
+      }
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "target_id", "property", "domain", "initial", "summary"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^state:[a-z0-9][a-z0-9._-]*$" },
+        "target_id": { "type": "string", "pattern": "^node:[a-z0-9][a-z0-9._-]*$" },
+        "property": { "type": "string", "minLength": 1 },
+        "domain": { "type": "object" },
+        "initial": {},
+        "summary": {},
+        "claim_refs": { "type": "array", "items": { "type": "string", "pattern": "^claim:[a-z0-9][a-z0-9._-]*$" } }
+      }
+    },
+    "grammar": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "version", "variant", "reading_axis"],
+      "properties": {
+        "type": { "type": "string" },
+        "version": { "const": "0.1" },
+        "variant": { "type": "string", "minLength": 1 },
+        "reading_axis": { "type": "string", "minLength": 1 },
+        "role_bindings": { "type": "object" }
+      }
+    }
+  }
+}
