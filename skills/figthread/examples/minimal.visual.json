@@ -1,0 +1,13 @@
+{
+  "schema_version": "figthread.visual/0.1",
+  "figure_id": "fig:minimal-pipeline",
+  "registry_hash": "sha256:51a4be6295cbe6994f7c9af00e512ef25183227161a5ebc91e12d15011cdb684",
+  "bindings": [
+    { "node_id": "node:root", "primitive": "core.frame@0.1", "variant": "panel", "salience": "S0", "props": {}, "state_bindings": {} },
+    { "node_id": "node:input", "primitive": "core.artifact@0.1", "variant": "document", "salience": "S1", "props": {}, "state_bindings": {} },
+    { "node_id": "node:queue", "primitive": "core.queue@0.1", "variant": "fifo", "salience": "S1", "props": { "capacity": 4 }, "state_bindings": { "occupancy": "state:queue-count" } },
+    { "node_id": "node:output", "primitive": "core.artifact@0.1", "variant": "payload", "salience": "S1", "props": {}, "state_bindings": {} }
+  ],
+  "custom_definitions": [],
+  "extensions": {}
+}
