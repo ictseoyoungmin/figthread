@@ -1,0 +1,8 @@
+{
+  "schema_version": "figthread.layout-request/0.1",
+  "target": { "id": "target-id", "profile": "technical-explainer", "viewport": { "width": 1200, "height": 900 }, "safe_area": { "top": 24, "right": 24, "bottom": 24, "left": 24 } },
+  "measurements": [
+    { "node_id": "node:example", "min_w": 96, "min_h": 56, "pref_w": 144, "pref_h": 72 }
+  ],
+  "options": { "preferred_gap": 32, "min_gap": 12, "container_padding": 16, "routing_grid": 4, "obstacle_margin": 8, "max_crossings": 4 }
+}

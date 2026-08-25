@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://figthread.dev/schemas/resolved-layout/0.1",
+  "title": "Figthread ResolvedLayout 0.1",
+  "type": "object",
+  "required": ["schema_version", "figure_hash", "layout_intent_hash", "engine_version", "target", "boxes", "text", "connectors", "diagnostics", "layout_hash"],
+  "properties": {
+    "schema_version": { "const": "figthread.resolved-layout/0.1" }, "figure_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }, "layout_intent_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }, "engine_version": { "type": "string" }, "target": { "type": "object" }, "boxes": { "type": "object" }, "text": { "type": "object" }, "connectors": { "type": "object" }, "diagnostics": { "type": "array" }, "layout_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  }
+}
