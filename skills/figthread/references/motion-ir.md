@@ -1,6 +1,6 @@
 # MotionSpec reference
 
-Motion is a deterministic semantic program compiled only after semantic and layout artifacts have passed their promotion gates. It is not a list of CSS animations or per-beat DOM callbacks.
+Motion is a deterministic semantic program compiled only after semantic, profile, and layout artifacts have passed their promotion gates. It is not a list of CSS animations or per-beat DOM callbacks. The selected profile's motion envelope is validated before semantic motion promotion.
 
 ## Core records
 
@@ -29,6 +29,18 @@ EventSpec {
 ```
 
 Use `schemas/motion-spec.schema.json` and `templates/motion-spec.json` for the exact serialized contract.
+
+## Profile envelope
+
+Profile validation runs before semantic motion compilation and checks only target-medium constraints:
+
+- whether motion is allowed;
+- cue-duration bounds;
+- minimum spacing between positive-duration semantic beats;
+- repeat autoplay policy and loop duration;
+- peak simultaneous moving semantic groups.
+
+These failures use `PRF007_MOTION` and must be repaired in the storyboard or target profile. Passing the profile envelope does not replace semantic motion validation.
 
 ## Semantic effects
 
@@ -66,13 +78,15 @@ Resolved geometry belongs to the promoted layout. Motion compilation may derive 
 - `trace` resolves its path from the promoted relation route;
 - `transfer` resolves start, path, and end from the promoted relation route.
 
-If the layout target changes, recompile motion tracks. Do not rewrite `MotionSpec` with new coordinates.
+The promoted layout carries profile-plan identity, so a target/profile change requires layout and motion recompilation. Do not rewrite `MotionSpec` with new coordinates.
 
 ## Static and reduced-motion behavior
 
 The motion document must name the figure's declared static summary snapshot. Static, print, and reduced-motion modes use that semantic summary state rather than freezing an arbitrary animation frame.
 
 ## Diagnostics
+
+Profile-envelope failures are reported before these semantic motion diagnostics.
 
 - `MOT001_BIND` — invalid upstream promotion, structural contract, or semantic reference binding.
 - `MOT002_TIME` — beat or cue timing exceeds its declared timeline/window.
@@ -88,4 +102,4 @@ The motion document must name the figure's declared static summary snapshot. Sta
 
 Canonical motion extensions require a registered pure compiler with declared inputs and deterministic output. The installed runtime does not execute arbitrary extension JavaScript, callbacks, network calls, randomness, or wall-clock time.
 
-When a motion gate fails, reopen the owning semantic, layout, state-domain, timing, cue, loop, or extension cause. Do not compensate by hand-editing compiled tracks, SVG coordinates, or renderer animation code.
+When a motion gate fails, reopen the owning profile, semantic, layout, state-domain, timing, cue, loop, or extension cause. Do not compensate by hand-editing compiled tracks, SVG coordinates, or renderer animation code.

@@ -1,13 +1,14 @@
 # Visual binding and primitive resolution
 
-`VisualSpec` binds semantic nodes to a compact primitive vocabulary without changing semantic meaning or resolved geometry. A successful visual promotion produces an immutable `PrimitivePlan` that downstream layout may consume.
+`VisualSpec` binds semantic nodes to a compact primitive vocabulary without changing semantic meaning or resolved geometry. A successful visual promotion produces an immutable `PrimitivePlan` that profile resolution consumes before layout.
 
 ## Authority boundary
 
 - `FigureSpec` decides what an object means.
 - `VisualSpec` decides which primitive expresses that object, which registered variant is used, which salience class applies, and which semantic states bind to exposed state channels.
 - `PrimitiveDefinition` decides local SVG vocabulary, intrinsic size, ports, slots, state channels, and visual tokens.
-- `PrimitivePlan` resolves those bindings against the exact registry hash and becomes the intrinsic measurement authority for layout.
+- `PrimitivePlan` resolves those bindings against the exact registry hash and owns the primitive intrinsic measurement baseline.
+- `ProfilePlan` may only strengthen that baseline with readability and spacing floors for the selected target.
 - `ResolvedLayout` still owns all final x/y/path geometry.
 
 A primitive may not invent a semantic relation, state, claim, or reading order that is absent from `FigureSpec`.
@@ -54,9 +55,11 @@ Motion later refers to semantic states and node/relation IDs. It does not addres
 
 ## Intrinsic measurements
 
-Layout measurements are derived from promoted primitive definitions. Agent-facing layout input contains target/profile/safe-area/options only; it does not contain hand-authored node measurements.
+Primitive measurements are derived from promoted primitive definitions. Agent-facing layout input contains target/profile/safe-area/options only; it does not contain hand-authored node measurements.
 
-Minimum dimensions are hard floors. Preferred dimensions are soft targets. Profile-owned text measurement may refine these metrics in a later capability, but it may not weaken a primitive minimum floor.
+Primitive minimum dimensions are hard floors and preferred dimensions are soft targets. Profile resolution then derives a deterministic conservative label floor and spacing floor. The profile may raise `min_w`, `min_h`, preferred size, or layout gaps, but may never reduce a primitive minimum.
+
+Exact browser glyph metrics remain renderer evidence; they are not substituted back into `PrimitivePlan`.
 
 ## Diagnostics
 
