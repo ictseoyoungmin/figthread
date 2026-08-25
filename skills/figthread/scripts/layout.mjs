@@ -6,7 +6,7 @@ import { compilePromotedLayout, promoteResolvedLayout } from "../runtime/layout.
 
 function usage() { console.error("usage: layout.mjs <figure-spec.json> <layout-request.json> [--mode draft|gate] [--promote]"); }
 const args=process.argv.slice(2), promote=args.includes("--promote"), modeIndex=args.indexOf("--mode"), mode=modeIndex>=0?args[modeIndex+1]:"gate";
-const positional=args.filter((arg,index)=>arg!=="--promote"&&arg!=="--mode"&&index!==modeIndex+1);
+const positional=args.filter((arg,index)=>arg!=="--promote"&&arg!=="--mode"&&!(modeIndex>=0&&index===modeIndex+1));
 if(positional.length!==2||!["draft","gate"].includes(mode)){usage();process.exitCode=2;} else {
   try {
     const [figure,request]=await Promise.all(positional.map(file=>readFile(resolve(file),"utf8").then(JSON.parse)));
