@@ -1,9 +1,9 @@
 schema: hadara.skill/v0.1
 name: figthread
-version: 0.2.0
+version: 0.2.1
 description: >-
-  Design and validate semantic figures through the FigureSpec gate and
-  deterministic LayoutIntent/ResolvedLayout promotion gate.
+  Design and validate semantic figures through promoted semantic state and
+  deterministic promoted layout geometry.
 entry:
   skill: SKILL.md
 resources:
@@ -22,6 +22,6 @@ interface:
   short_description: "Author semantic figures with deterministic layout gates"
   icon_small: "./assets/icon.svg"
   icon_large: "./assets/icon.svg"
-  default_prompt: "Use $figthread to author, gate, and deterministically lay out a semantic figure before downstream rendering."
+  default_prompt: "Use $figthread to author and validate semantic figure state, then produce deterministic promoted layout geometry when layout is required."
 policy:
   allow_implicit_invocation: true
