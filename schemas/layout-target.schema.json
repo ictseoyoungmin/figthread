@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://figthread.dev/schemas/layout-target/0.1",
+  "title": "Figthread LayoutTarget 0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "target", "options"],
+  "properties": {
+    "schema_version": { "const": "figthread.layout-target/0.1" },
+    "target": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "profile", "viewport", "safe_area"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$" },
+        "profile": { "type": "string", "enum": ["paper", "paper-animated", "presentation", "technical-explainer", "infographic"] },
+        "viewport": { "type": "object", "additionalProperties": false, "required": ["width", "height"], "properties": { "width": { "type": "number", "minimum": 1 }, "height": { "type": "number", "minimum": 1 } } },
+        "safe_area": { "type": "object", "additionalProperties": false, "required": ["top", "right", "bottom", "left"], "properties": { "top": { "type": "number", "minimum": 0 }, "right": { "type": "number", "minimum": 0 }, "bottom": { "type": "number", "minimum": 0 }, "left": { "type": "number", "minimum": 0 } } },
+        "density_budget": { "type": "number", "minimum": 0 }
+      }
+    },
+    "options": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "preferred_gap": { "type": "number", "minimum": 0 },
+        "min_gap": { "type": "number", "minimum": 0 },
+        "container_padding": { "type": "number", "minimum": 0 },
+        "routing_grid": { "type": "number", "minimum": 1 },
+        "obstacle_margin": { "type": "number", "minimum": 0 },
+        "max_crossings": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}
