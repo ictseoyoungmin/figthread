@@ -1,57 +1,54 @@
 # Figthread
 
-Figthread is a semantic figure authoring system. The current implementation slice is **D-001: FigureSpec structural + semantic promotion gate**. Layout, motion compilation, rendering, and export remain downstream work.
+Figthread is a semantic figure authoring system. The implementation now covers two promoted slices:
+
+- **D-001** — FigureSpec structural + semantic gate
+- **D-002** — LayoutIntent + deterministic ResolvedLayout gate
+
+Motion compilation, rendering, visual primitives, profile measurement, grammar registry closure, and export remain downstream slices.
 
 ## Source of truth
 
-The installable skill is self-contained under `skills/figthread/` and is the implementation source of truth for D-001:
+The installable skill is self-contained under `skills/figthread/` and is the implementation source of truth:
 
-- `skills/figthread/schemas/figure-spec.schema.json` — FigureSpec 0.1 structural contract
-- `skills/figthread/runtime/` — canonical hashing, structural validation, semantic validation, promotion
-- `skills/figthread/scripts/validate.mjs` — cwd-independent validator CLI
-- `skills/figthread/examples/minimal.figure.json` — passing canonical fixture
-- `skills/figthread/references/figure-ir.md` — normative D-001 contract
+- `skills/figthread/schemas/figure-spec.schema.json` — FigureSpec 0.1
+- `skills/figthread/schemas/layout-*.schema.json` — D-002 request/intent/resolved contracts
+- `skills/figthread/runtime/validator.js` — D-001 promotion
+- `skills/figthread/runtime/layout.js` — D-002 deterministic layout compiler/router/promotion
+- `skills/figthread/scripts/validate.mjs` — FigureSpec CLI
+- `skills/figthread/scripts/layout.mjs` — layout CLI
+- `skills/figthread/references/figure-ir.md` and `layout-resolution.md` — normative contracts
 
-Root `src/` and `test/` are repository development harnesses and import the skill runtime rather than maintaining a second validator implementation.
+Root `src/`, `schemas/`, `examples/`, and `test/` are repository development mirrors/harnesses and do not maintain a second runtime implementation.
 
-## D-001 gate
+## Promotion pipeline
 
-Validation is layered:
+```text
+FigureSpec -> D-001 gate -> validated_figure -> LayoutRequest -> LayoutIntent -> deterministic solve/router/audit -> ResolvedLayout
+```
 
-1. JSON Schema structural validation (`SCH001`)
-2. core semantic invariants (`IR001`–`IR009`)
-3. gate promotion with deterministic content hash
+D-002 never consumes an unpromoted FigureSpec. LayoutIntent contains semantic geometry intent but no resolved x/y/path data. ResolvedLayout is the first authoritative geometry object.
 
-Only `mode: gate` with zero errors is promotion-eligible. Draft mode is non-authoritative.
+## Commands
 
 ```bash
 npm test
 npm run validate -- skills/figthread/examples/minimal.figure.json
 npm run validate:promote -- skills/figthread/examples/minimal.figure.json
+npm run layout -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.layout-request.json
+npm run layout:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.layout-request.json
 ```
 
-The CLI prints deterministic JSON. A failed gate exits non-zero.
+## D-002 guarantees
 
-## Installable skill
+- consumes only a verified D-001 promotion receipt
+- deterministic LayoutIntent/ResolvedLayout hashes
+- explicit target viewport + safe area and normalized intrinsic metrics identity
+- recursive containment layout with stable reading order
+- hard minimum floors; soft gap/preferred-size shrink before hard failure
+- orthogonal routing with semantic obstacle/crossing scoring
+- overflow, collision, and crossing-budget diagnostics
+- left-right/top-down base solver only; unsupported radial axes fail closed instead of using force layout
+- immutable promoted layout snapshots and receipts
 
-```bash
-npx skills add ictseoyoungmin/figthread --agent claude-code
-npx skills add ictseoyoungmin/figthread --agent codex
-```
-
-When installed, do not assume the user's working directory is this repository. Resolve the installed `skills/figthread/` directory and invoke its own `scripts/validate.mjs`.
-
-## Current invariant coverage
-
-- global stable-ID uniqueness
-- typed reference integrity, including composition, grammar role bindings, emphasis, and snapshots
-- parent cycle detection and root reachability
-- primary/must-preserve claim witness reachability
-- recursive descendant claim witness
-- state domain validation and static-summary reproducibility
-- geometry exclusion recursively through arrays and objects
-- namespaced extensions
-- deterministic issue ordering
-- draft/gate distinction and promotion hash
-
-The next implementation slice should consume only `validated_figure` output from this gate.
+The explicit intrinsic measurement bridge is temporary: later VisualSpec/primitive/profile slices will own how those measurements are produced while preserving the D-002 authority boundary.

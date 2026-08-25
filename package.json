@@ -1,13 +1,15 @@
 {
   "name": "figthread",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
-  "description": "Semantic figure authoring foundation for Figthread.",
+  "description": "Semantic figure authoring and deterministic layout foundation for Figthread.",
   "type": "module",
   "scripts": {
     "test": "node --test",
     "validate": "node skills/figthread/scripts/validate.mjs",
-    "validate:promote": "node skills/figthread/scripts/validate.mjs --promote"
+    "validate:promote": "node skills/figthread/scripts/validate.mjs --promote",
+    "layout": "node skills/figthread/scripts/layout.mjs",
+    "layout:promote": "node skills/figthread/scripts/layout.mjs --promote"
   },
   "engines": { "node": ">=20" },
   "license": "MIT"
