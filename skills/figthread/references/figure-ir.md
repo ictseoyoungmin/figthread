@@ -1,4 +1,4 @@
-# FigureSpec 0.1 contract
+# FigureSpec contract
 
 `FigureSpec` is the canonical semantic IR. It must pass structural and semantic validation before layout can consume it. Resolved geometry never belongs here.
 
