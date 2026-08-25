@@ -11,7 +11,7 @@ Layout consumes only matching promoted semantic and primitive artifacts. Raw sem
 - `ResolvedLayout` owns boxes, anchors, connector points/path, diagnostics, and `layout_hash`.
 - Renderer code must consume `ResolvedLayout`; it must not invent alternate placement.
 
-The layout engine still has an internal measurement bridge, but agent-facing authoring does not supply it. The promoted primitive plan is the only valid source for those intrinsic metrics.
+Agent-facing layout input never supplies node measurements. The promoted primitive plan is the sole measurement authority for deterministic layout.
 
 ## Determinism
 
