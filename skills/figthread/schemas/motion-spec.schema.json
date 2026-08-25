@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://figthread.local/schemas/motion-spec.schema.json",
+  "title": "MotionSpec",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "figure_id", "mode", "timeline", "events", "static_snapshot_id", "extensions"],
+  "properties": {
+    "schema_version": { "const": "figthread.motion/0.1" },
+    "id": { "type": "string", "pattern": "^motion:[A-Za-z0-9._:-]+$" },
+    "figure_id": { "type": "string", "pattern": "^fig:[A-Za-z0-9._:-]+$" },
+    "mode": { "enum": ["staged", "semantic-loop", "continuous", "state-transition", "propagation", "routing", "accumulation", "comparison-sync", "interactive"] },
+    "timeline": { "$ref": "#/$defs/timeline" },
+    "events": { "type": "array", "items": { "$ref": "#/$defs/event" } },
+    "static_snapshot_id": { "type": "string", "pattern": "^snapshot:[A-Za-z0-9._:-]+$" },
+    "extensions": { "type": "object" }
+  },
+  "$defs": {
+    "timeline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["duration_ms", "loop", "beats"],
+      "properties": {
+        "duration_ms": { "type": "integer", "minimum": 1 },
+        "loop": { "$ref": "#/$defs/loop" },
+        "beats": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/beat" } }
+      }
+    },
+    "loop": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "closure"],
+      "properties": {
+        "mode": { "enum": ["none", "repeat"] },
+        "closure": { "enum": ["none", "explicit-reset"] }
+      }
+    },
+    "beat": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "at_ms", "duration_ms", "event_ids"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^beat:[A-Za-z0-9._:-]+$" },
+        "at_ms": { "type": "integer", "minimum": 0 },
+        "duration_ms": { "type": "integer", "minimum": 0 },
+        "order": { "type": "integer", "minimum": 0 },
+        "event_ids": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^event:[A-Za-z0-9._:-]+$" } }
+      }
+    },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^event:[A-Za-z0-9._:-]+$" },
+        "kind": { "type": "string", "minLength": 1 },
+        "order": { "type": "integer", "minimum": 0 },
+        "effects": { "type": "array", "items": { "$ref": "#/$defs/effect" } },
+        "cues": { "type": "array", "items": { "$ref": "#/$defs/cue" } }
+      }
+    },
+    "effect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state_id", "op", "value"],
+      "properties": {
+        "state_id": { "type": "string", "pattern": "^state:[A-Za-z0-9._:-]+$" },
+        "op": { "enum": ["set", "add"] },
+        "value": {}
+      }
+    },
+    "cue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": { "enum": ["reveal", "focus", "transfer", "trace", "morph-state"] },
+        "target_id": { "type": "string", "minLength": 1 },
+        "subject_id": { "type": "string", "minLength": 1 },
+        "via_relation": { "type": "string", "pattern": "^relation:[A-Za-z0-9._:-]+$" },
+        "start_offset_ms": { "type": "integer", "minimum": 0 },
+        "duration_ms": { "type": "integer", "minimum": 0 },
+        "easing": { "enum": ["linear", "ease-in", "ease-out", "ease-in-out", "step-end"] }
+      }
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "schema_version": "figthread.motion/0.1",
+  "id": "motion:example",
+  "figure_id": "fig:example",
+  "mode": "staged",
+  "timeline": {
+    "duration_ms": 2400,
+    "loop": { "mode": "none", "closure": "none" },
+    "beats": [
+      { "id": "beat:main", "at_ms": 400, "duration_ms": 1200, "order": 0, "event_ids": ["event:main"] }
+    ]
+  },
+  "events": [
+    {
+      "id": "event:main",
+      "kind": "focus",
+      "order": 0,
+      "cues": [
+        { "kind": "focus", "target_id": "node:target", "duration_ms": 1200, "easing": "ease-in-out" }
+      ]
+    }
+  ],
+  "static_snapshot_id": "snapshot:summary",
+  "extensions": {}
+}

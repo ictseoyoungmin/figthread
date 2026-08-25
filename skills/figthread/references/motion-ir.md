@@ -1,57 +1,91 @@
-# MotionSpec 0.1 reference
+# MotionSpec reference
 
-Motion is a deterministic semantic program compiled after FigureSpec and
-`ResolvedLayout` have passed their gates. It is not a list of CSS animations or
-per-beat DOM callbacks.
+Motion is a deterministic semantic program compiled only after semantic and layout artifacts have passed their promotion gates. It is not a list of CSS animations or per-beat DOM callbacks.
 
 ## Core records
 
 ```text
 MotionSpec {
-  schema_version: "figthread.motion/0.1",
   id,
   figure_id,
-  initial_state,
-  beats: [BeatSpec...],
-  loop: "none" | "repeat",
-  static_snapshot_id
+  mode,
+  timeline: {
+    duration_ms,
+    loop: { mode, closure },
+    beats: [BeatSpec...]
+  },
+  events: [EventSpec...],
+  static_snapshot_id,
+  extensions
 }
 
 BeatSpec {
-  id, at_ms, duration_ms, order?,
-  events: [EventSpec...]
+  id, at_ms, duration_ms, order?, event_ids
 }
 
 EventSpec {
-  id, kind, effects?, cues?
+  id, kind, order?, effects?, cues?
 }
 ```
 
-State effects use `set` for every domain and `add` only for numeric, count, or
-ratio domains. Visual cues are semantic and may use `reveal`, `focus`,
-`transfer`, `trace`, or `morph-state`. Cues reference node IDs and relation IDs,
-not coordinates.
+Use `schemas/motion-spec.schema.json` and `templates/motion-spec.json` for the exact serialized contract.
+
+## Semantic effects
+
+State effects use `set` for every domain and `add` only for numeric, count, or ratio domains. Every resulting value must remain inside the corresponding `StateSpec.domain`.
+
+Events are scheduled through beats. Every event must be scheduled exactly once. Multiple events may share a beat, but two semantic writers may not update the same state at the same semantic time.
+
+## Semantic cues
+
+Supported cues are:
+
+- `reveal` — make a semantic node newly visible or salient;
+- `focus` — emphasize an already-present semantic node;
+- `transfer` — move explanatory attention or a semantic subject along a declared relation;
+- `trace` — reveal or emphasize a declared relation path;
+- `morph-state` — visually reflect a semantic state change on a node.
+
+Cues reference node IDs and relation IDs. They do not contain coordinates, SVG paths, layout boxes, selectors, or DOM callbacks.
 
 ## Evaluation contract
 
-At an integer `time_ms`, evaluate from the initial semantic snapshot, apply all
-effects whose beat begins at or before that time in stable order, then sample
-active cue windows. The canonical order is:
+Time is integer milliseconds. Seeking starts from the promoted figure's initial semantic state, then replays scheduled effects in canonical order:
 
 ```text
-at_ms → beat.order → event.order → lexical stable ID
+beat.at_ms → beat.order → event.order → lexical event id
 ```
 
-Seeking must not read the previous DOM frame. A repeat loop must close back to
-the initial state and clear transient cues; otherwise use `loop: "none"`.
-Print and reduced-motion modes render the declared static snapshot rather than
-freezing an arbitrary animation frame.
+Seeking must not read the previous DOM frame. Repeating timelines must explicitly restore every semantic state to its initial value before the loop boundary. Non-repeating timelines use `closure: none`.
 
 ## Geometry boundary
 
-For a transfer cue, store `subject`, `via_relation`, and a time window. The
-compiler resolves `start`, `path`, and `end` from layout ports and routes. If a
-layout target changes, recompile tracks without rewriting MotionSpec.
+Resolved geometry belongs to the promoted layout. Motion compilation may derive geometry only in `MotionProgram`:
 
-Canonical extensions must be registered pure compilers with declared input and
-output, no DOM/time/random/network dependency, and deterministic output.
+- node cues resolve target boxes from `ResolvedLayout.boxes`;
+- `trace` resolves its path from the promoted relation route;
+- `transfer` resolves start, path, and end from the promoted relation route.
+
+If the layout target changes, recompile motion tracks. Do not rewrite `MotionSpec` with new coordinates.
+
+## Static and reduced-motion behavior
+
+The motion document must name the figure's declared static summary snapshot. Static, print, and reduced-motion modes use that semantic summary state rather than freezing an arbitrary animation frame.
+
+## Diagnostics
+
+- `MOT001_BIND` — invalid upstream promotion, structural contract, or semantic reference binding.
+- `MOT002_TIME` — beat or cue timing exceeds its declared timeline/window.
+- `MOT003_DOMAIN` — a state effect uses an invalid operation or leaves its declared domain.
+- `MOT004_GEOMETRY` — canonical motion contains resolved geometry or required promoted layout geometry is missing.
+- `MOT005_CUE` — cue semantic requirements are incomplete or invalid.
+- `MOT006_WRITER` — concurrent semantic writers target the same state at the same time.
+- `MOT007_LOOP` — loop closure mode is invalid or semantic state does not close.
+- `MOT008_STATIC` — static snapshot does not resolve to the figure's semantic summary snapshot.
+- `MOT009_PURITY` — an extension or executable behavior has no registered pure compiler.
+
+## Purity and recovery
+
+Canonical motion extensions require a registered pure compiler with declared inputs and deterministic output. The installed runtime does not execute arbitrary extension JavaScript, callbacks, network calls, randomness, or wall-clock time.
+
+When a motion gate fails, reopen the owning semantic, layout, state-domain, timing, cue, loop, or extension cause. Do not compensate by hand-editing compiled tracks, SVG coordinates, or renderer animation code.

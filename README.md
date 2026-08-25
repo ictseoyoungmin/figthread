@@ -1,33 +1,38 @@
 # Figthread
 
-Figthread is a semantic figure authoring system. The implementation now covers two promoted slices:
+Figthread is a semantic figure authoring system. The implementation now covers three promoted slices:
 
 - **D-001** — FigureSpec structural + semantic gate
 - **D-002** — LayoutIntent + deterministic ResolvedLayout gate
+- **D-003** — MotionSpec + deterministic MotionProgram gate
 
-Motion compilation, rendering, visual primitives, profile measurement, grammar registry closure, and export remain downstream slices.
+Rendering, visual primitives, profile measurement, grammar registry closure, and export remain downstream slices.
 
 ## Source of truth
 
 The installable skill is self-contained under `skills/figthread/` and is the implementation source of truth:
 
-- `skills/figthread/schemas/figure-spec.schema.json` — FigureSpec 0.1
-- `skills/figthread/schemas/layout-*.schema.json` — D-002 request/intent/resolved contracts
+- `skills/figthread/schemas/figure-spec.schema.json` — semantic figure contract
+- `skills/figthread/schemas/layout-*.schema.json` — layout request/intent/resolved contracts
+- `skills/figthread/schemas/motion-spec.schema.json` — semantic motion contract
 - `skills/figthread/runtime/validator.js` — D-001 promotion
 - `skills/figthread/runtime/layout.js` — D-002 deterministic layout compiler/router/promotion
-- `skills/figthread/scripts/validate.mjs` — FigureSpec CLI
-- `skills/figthread/scripts/layout.mjs` — layout CLI
-- `skills/figthread/references/figure-ir.md` and `layout-resolution.md` — normative contracts
+- `skills/figthread/runtime/motion.js` — D-003 motion validator/compiler/evaluator/promotion
+- `skills/figthread/scripts/*.mjs` — skill-local CLIs
+- `skills/figthread/references/` — agent-facing normative behavior without internal roadmap labels
 
 Root `src/`, `schemas/`, `examples/`, and `test/` are repository development mirrors/harnesses and do not maintain a second runtime implementation.
 
 ## Promotion pipeline
 
 ```text
-FigureSpec -> D-001 gate -> validated_figure -> LayoutRequest -> LayoutIntent -> deterministic solve/router/audit -> ResolvedLayout
+FigureSpec
+  -> D-001 gate -> validated_figure
+  -> LayoutRequest -> D-002 gate -> ResolvedLayout
+  -> MotionSpec -> D-003 gate -> MotionProgram
 ```
 
-D-002 never consumes an unpromoted FigureSpec. LayoutIntent contains semantic geometry intent but no resolved x/y/path data. ResolvedLayout is the first authoritative geometry object.
+D-002 never consumes an unpromoted FigureSpec. D-003 never consumes raw or mismatched semantic/layout state. MotionSpec contains semantic time/effects/cues only; geometry appears only in MotionProgram after resolution from promoted layout.
 
 ## Commands
 
@@ -37,18 +42,22 @@ npm run validate -- skills/figthread/examples/minimal.figure.json
 npm run validate:promote -- skills/figthread/examples/minimal.figure.json
 npm run layout -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.layout-request.json
 npm run layout:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.layout-request.json
+npm run motion -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.layout-request.json skills/figthread/examples/minimal.motion.json
+npm run motion:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.layout-request.json skills/figthread/examples/minimal.motion.json
 ```
 
-## D-002 guarantees
+## D-003 guarantees
 
-- consumes only a verified D-001 promotion receipt
-- deterministic LayoutIntent/ResolvedLayout hashes
-- explicit target viewport + safe area and normalized intrinsic metrics identity
-- recursive containment layout with stable reading order
-- hard minimum floors; soft gap/preferred-size shrink before hard failure
-- orthogonal routing with semantic obstacle/crossing scoring
-- overflow, collision, and crossing-budget diagnostics
-- left-right/top-down base solver only; unsupported radial axes fail closed instead of using force layout
-- immutable promoted layout snapshots and receipts
+- consumes only matching verified semantic + layout promotion receipts
+- deterministic integer-millisecond event ordering and program hashes
+- event-sourced seek independent of prior DOM/frame state
+- state effects validated against declared semantic domains
+- concurrent writers rejected
+- canonical motion contains no resolved geometry
+- transfer/trace geometry derived only from promoted connector routes
+- repeat loops require explicit semantic closure
+- static/reduced-motion state comes from the figure summary snapshot
+- arbitrary extension JavaScript/callbacks/network/randomness are not executable canonical motion
+- immutable promoted MotionProgram snapshots and receipts
 
-The explicit intrinsic measurement bridge is temporary: later VisualSpec/primitive/profile slices will own how those measurements are produced while preserving the D-002 authority boundary.
+The explicit intrinsic measurement bridge remains temporary: later VisualSpec/primitive/profile slices will own how measurements are produced while preserving the semantic, geometry, and motion authority boundaries.

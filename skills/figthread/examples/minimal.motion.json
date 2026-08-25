@@ -1,0 +1,44 @@
+{
+  "schema_version": "figthread.motion/0.1",
+  "id": "motion:minimal-pipeline",
+  "figure_id": "fig:minimal-pipeline",
+  "mode": "semantic-loop",
+  "timeline": {
+    "duration_ms": 3600,
+    "loop": { "mode": "repeat", "closure": "explicit-reset" },
+    "beats": [
+      { "id": "beat:enqueue", "at_ms": 400, "duration_ms": 700, "order": 0, "event_ids": ["event:enqueue"] },
+      { "id": "beat:transfer", "at_ms": 1400, "duration_ms": 900, "order": 1, "event_ids": ["event:transfer"] },
+      { "id": "beat:reset", "at_ms": 3300, "duration_ms": 0, "order": 2, "event_ids": ["event:reset"] }
+    ]
+  },
+  "events": [
+    {
+      "id": "event:enqueue",
+      "kind": "state-change",
+      "order": 0,
+      "effects": [{ "state_id": "state:queue-count", "op": "set", "value": 1 }],
+      "cues": [
+        { "kind": "reveal", "target_id": "node:queue", "duration_ms": 500, "easing": "ease-out" },
+        { "kind": "focus", "target_id": "node:queue", "start_offset_ms": 100, "duration_ms": 500, "easing": "ease-in-out" }
+      ]
+    },
+    {
+      "id": "event:transfer",
+      "kind": "transfer",
+      "order": 0,
+      "cues": [
+        { "kind": "transfer", "subject_id": "node:queue", "via_relation": "relation:queue-output", "duration_ms": 900, "easing": "linear" },
+        { "kind": "trace", "via_relation": "relation:queue-output", "duration_ms": 900, "easing": "linear" }
+      ]
+    },
+    {
+      "id": "event:reset",
+      "kind": "reset",
+      "order": 0,
+      "effects": [{ "state_id": "state:queue-count", "op": "set", "value": 0 }]
+    }
+  ],
+  "static_snapshot_id": "snapshot:summary",
+  "extensions": {}
+}
