@@ -3,7 +3,7 @@ on:
   push:
   pull_request:
 jobs:
-  d001-gate:
+  promotion-gates:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -16,3 +16,5 @@ jobs:
       - run: npm test
       - run: npm run validate -- skills/figthread/examples/minimal.figure.json
       - run: npm run validate:promote -- skills/figthread/examples/minimal.figure.json
+      - run: npm run layout -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.layout-request.json
+      - run: npm run layout:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.layout-request.json

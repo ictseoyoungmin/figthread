@@ -8,55 +8,43 @@ description: >-
 
 # Figthread
 
-Figure first, motion second. D-001 is the mandatory semantic gate: no layout or renderer work may treat an unpromoted FigureSpec as authoritative.
+Figure first, motion second. D-001 establishes semantic authority; D-002 establishes deterministic geometry authority. No downstream renderer or motion work may bypass either promotion gate.
 
-## Required reading for D-001
+## Required reading
 
-Read, in order:
-
-1. [references/figure-ir.md](references/figure-ir.md)
-2. [schemas/figure-spec.schema.json](schemas/figure-spec.schema.json) when authoring or debugging structure
-3. [templates/figure-spec.json](templates/figure-spec.json) as a starting shape
+For D-001 read `references/figure-ir.md`, `schemas/figure-spec.schema.json`, and `templates/figure-spec.json`.
+Before D-002 also read `references/layout-resolution.md`, `schemas/layout-request.schema.json`, and `templates/layout-request.json`.
 
 ## D-001 workflow
 
 1. Understand source provenance, audience, target profile, exclusions, and primary question.
-2. Extract primary/supporting/contrast/evidence claims and assign stable `claim:` IDs.
-3. Author `FigureSpec 0.1` with semantic nodes, relations, states, explicit composition, emphasis, and static summary snapshot.
-4. Run the skill-local validator before layout:
+2. Extract claims and author FigureSpec 0.1.
+3. Run `node <skill-root>/scripts/validate.mjs <figure-spec.json> --mode gate`.
+4. Repair semantic causes until zero errors, then run the same command with `--promote`.
+5. Only the promoted `validated_figure` is authoritative downstream.
 
-```bash
-node <skill-root>/scripts/validate.mjs <figure-spec.json> --mode gate
-```
+## D-002 workflow
 
-Do **not** run `npm` in the user's project as a substitute for the installed skill runtime. Resolve `<skill-root>` from this `SKILL.md` location.
-5. If the report fails, repair the owning semantic cause and rerun the gate. Do not compensate downstream.
-6. Promote only after a zero-error gate:
-
-```bash
-node <skill-root>/scripts/validate.mjs <figure-spec.json> --promote
-```
-
-7. Pass only the promoted `validated_figure` to future layout work.
+1. Start from the D-001 promoted FigureSpec; never layout a raw document.
+2. Choose one target viewport/profile/safe area.
+3. Supply intrinsic min/preferred measurements for every non-root semantic node. This bridge remains explicit until later VisualSpec/primitive/profile slices own measurement.
+4. Run `node <skill-root>/scripts/layout.mjs <figure-spec.json> <layout-request.json> --mode gate`.
+5. Repair LAY failures at their layout/upstream cause; do not compensate in renderer CSS.
+6. Promote with `node <skill-root>/scripts/layout.mjs <figure-spec.json> <layout-request.json> --promote`.
+7. Pass only the promoted `ResolvedLayout` to future rendering/motion work.
 
 ## Non-negotiables
 
-- `FigureSpec` owns meaning; layout owns coordinates/ports/routes/wrapping.
-- Every non-root semantic node reaches `composition.root_id` through `parent_id`.
-- Every primary/must-preserve claim has a witness in the reading composition.
-- Every semantic node directly or recursively serves a claim.
-- The static snapshot explicitly reproduces every `StateSpec.summary` value.
-- Resolved geometry is forbidden anywhere in semantic IR, including nested arrays.
-- Extensions are namespaced and never silently ignored.
-- Draft mode is non-authoritative. Only a gate pass may promote.
-- Validation reports are deterministic; file existence or plausible visuals are not proof.
+- FigureSpec owns meaning. LayoutIntent owns constraints/regions/ports. ResolvedLayout owns actual geometry.
+- LayoutIntent must not contain resolved x/y/path geometry.
+- Same promoted figure + normalized measurements + target + options + engine version => same layout hash.
+- Minimum intrinsic dimensions are hard floors. Reduce soft gaps/preferred sizes first; fail rather than shrink below minimum.
+- No force-directed or stochastic fallback exists in D-002.
+- Connector semantics remain in FigureSpec; router chooses actual anchors/path only after boxes freeze.
+- Browser/CSS auto-layout is never canonical geometry.
+- Draft mode is non-authoritative. Only gate promotion unlocks the next slice.
+- Resolve `<skill-root>` from this installed skill; never substitute the user's project npm scripts.
 
-## Output contract for this slice
+## Current slice boundary
 
-The D-001 deliverable is:
-
-- a FigureSpec JSON document,
-- a deterministic ValidationReport,
-- and, on gate success, a content-hashed promotion receipt plus `validated_figure`.
-
-LayoutIntent, ResolvedLayout, MotionSpec compilation, HTML rendering, and export belong to later slices.
+D-002 supports deterministic left-right and top-down base solving. Radial/topology-specific grammar adapters, VisualSpec, primitive measurement, profile font floors, text reflow, MotionSpec, SVG rendering, and export remain later slices.
