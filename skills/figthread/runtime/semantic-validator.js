@@ -56,6 +56,7 @@ export function validateSemantics(document) {
   if (!claimIds.has(document.thesis_claim_id)) issues.push(issue("IR002", "thesis_claim_id must reference an existing claim", { path: "thesis_claim_id", stage_owner: "claim-extraction" }));
   if (document.composition?.grammar?.type !== document.figure_type) issues.push(issue("IR002", "composition grammar type must match figure_type", { path: "composition.grammar.type" }));
   if (!nodeIds.has(rootId)) issues.push(issue("IR002", "composition.root_id must reference an existing node", { path: "composition.root_id" }));
+  else if (nodeById.get(rootId)?.parent_id !== undefined) issues.push(issue("IR003", "composition root must not declare parent_id", { object_id: rootId, path: `${rootId}.parent_id`, repair_hint: "Make composition.root_id the top of the semantic parent tree." }));
   for (const ref of asArray(document.composition?.order)) if (!nodeIds.has(ref)) issues.push(issue("IR002", `composition order reference '${ref}' does not exist`, { path: "composition.order" }));
   for (const ref of collectRoleBindingRefs(document.composition?.grammar?.role_bindings)) if (!nodeIds.has(ref)) issues.push(issue("IR002", `grammar role binding '${ref}' must resolve to a node`, { path: "composition.grammar.role_bindings" }));
 
@@ -77,6 +78,7 @@ export function validateSemantics(document) {
     if (!asObject(state)) continue;
     checkClaimRefs(state);
     if (!nodeIds.has(state.target_id)) issues.push(issue("IR002", `state target '${state.target_id}' does not exist`, { object_id: state.id, path: `${state.id}.target_id` }));
+    if (asObject(state.domain) && state.domain.min !== undefined && state.domain.max !== undefined && state.domain.min > state.domain.max) issues.push(issue("IR006", "state domain min must be <= max", { object_id: state.id, path: `${state.id}.domain`, repair_hint: "Correct the numeric domain bounds." }));
     if (!valueInDomain(state.initial, state.domain) || !valueInDomain(state.summary, state.domain)) issues.push(issue("IR006", "state initial and summary values must belong to the declared domain", { object_id: state.id, path: `${state.id}.domain`, repair_hint: "Align initial/summary with the declared domain and numeric bounds." }));
     addGeometryIssues(state, state.id, state.id, issues);
   }
