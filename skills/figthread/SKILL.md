@@ -10,7 +10,7 @@ description: >-
 
 Figure first, motion second.
 
-Semantic figure state must be validated and promoted before visual binding. Visual binding must be validated and promoted before a profile may strengthen readability and density constraints. A promoted profile plan must exist before layout treats measurements or target spacing as authoritative. Deterministic layout must be validated and promoted before motion or rendering treats geometry as authoritative. Semantic motion must satisfy both the selected profile envelope and semantic motion validation before a renderer treats animation tracks as authoritative. Do not bypass an upstream promotion gate.
+Semantic figure state must be validated and promoted before visual binding. Visual binding must be validated and promoted before a profile may strengthen readability and density constraints. A promoted profile plan must exist before layout treats measurements or target spacing as authoritative. Deterministic layout must be validated and promoted before rendering or motion treats geometry as authoritative. Static rendering must consume the promoted semantic summary snapshot and audit the SVG it actually emitted. Semantic motion must satisfy both the selected profile envelope and semantic motion validation before a runtime treats animation tracks as authoritative. Do not bypass an upstream promotion gate.
 
 ## Required reading
 
@@ -37,6 +37,10 @@ Before target/profile resolution, also read:
 Before deterministic layout, also read:
 
 1. `references/layout-resolution.md`
+
+Before static SVG rendering, also read:
+
+1. `references/rendering.md`
 
 When motion adds explanatory value, also read:
 
@@ -82,6 +86,16 @@ When motion adds explanatory value, also read:
 4. Promote with the same command and `--promote`.
 5. Treat only the promoted `ResolvedLayout` as geometry authority.
 
+## Static SVG rendering and promotion
+
+1. Start from matching promoted semantic, primitive, profile, and layout artifacts.
+2. Run `node <skill-root>/scripts/render.mjs <figure-spec.json> <visual-spec.json> <layout-target.json> --mode gate`.
+3. Repair `RND` failures at their semantic-state, primitive, profile-token, or layout owner. Do not hand-edit the generated SVG to make the render pass.
+4. Promote with the same command and `--promote`; use `--out <figure.svg>` and `--evidence <evidence.json>` when file output is required.
+5. Treat only the promoted `rendered_svg` as the certified static SVG derivative for that exact promoted layout and profile target.
+6. The renderer audits explicit emitted font size, essential stroke width, contrast, grayscale policy, node/connector coverage, and SVG purity from the SVG it actually serialized.
+7. Browser-resolved glyph extents, font fallback identity, and final browser text bounding boxes are not yet certified. Keep that limitation explicit rather than inventing a pass.
+
 ## Semantic motion and promotion
 
 Use motion only when it explains sequence, transfer, propagation, state change, accumulation, routing, or comparison more clearly than the static figure alone.
@@ -105,11 +119,12 @@ Use motion only when it explains sequence, transfer, propagation, state change, 
 - `ProfilePlan` owns the selected threshold identity, density result, profile-strengthened measurements, and effective target spacing.
 - `LayoutIntent` owns target, regions, constraints, ports, and routing policy.
 - `ResolvedLayout` owns actual boxes, anchors, and connector geometry.
+- The static SVG renderer owns deterministic SVG serialization, core primitive drawing implementation, profile-safe visual tokens, and rendered-profile evidence; it may not change promoted geometry or semantics.
 - `MotionSpec` owns semantic timing, state effects, and cues, but no resolved geometry.
 - `MotionProgram` owns deterministic compiled tracks whose geometry is resolved from `ResolvedLayout`.
 - Semantic relations remain in `FigureSpec`; the router chooses anchors and paths only after boxes freeze.
 - Browser or CSS auto-layout is never canonical geometry.
-- View/runtime state must not silently mutate promoted semantic, visual, profile, layout, or motion state.
+- View/runtime state must not silently mutate promoted semantic, visual, profile, layout, render, or motion state.
 
 ## Non-negotiables
 
@@ -124,8 +139,13 @@ Use motion only when it explains sequence, transfer, propagation, state change, 
 - Presentation targets require at least a 5% safe margin on every side.
 - Paper rejects explanatory motion; presentation rejects repeat autoplay by default.
 - `LayoutIntent` must not contain resolved `x/y/path` geometry.
+- Rendered SVG must use only promoted boxes/routes for global geometry and must not invoke browser/CSS auto-layout.
+- Static rendering uses the declared semantic summary snapshot, never an arbitrary motion frame.
+- Render evidence is content-hashed and must fail on emitted font/stroke/contrast/grayscale/purity violations that the installed renderer claims to certify.
+- Color must not be the sole visual discriminator for emphasis or state.
 - `MotionSpec` must not contain resolved geometry or executable callbacks.
 - Same promoted figure + primitive plan + profile plan + engine version must produce the same layout hash.
+- Same promoted semantic/visual/profile/layout authorities + render engine version must produce the same SVG/render hashes.
 - Same promoted figure + promoted layout + canonical motion input + motion engine version must produce the same motion program hash.
 - Force-directed and stochastic layout are not allowed fallbacks.
 - Motion evaluation uses integer milliseconds and deterministic event ordering.
@@ -139,6 +159,6 @@ Use motion only when it explains sequence, transfer, propagation, state change, 
 
 ## Current runtime capabilities
 
-The installed runtime supports semantic validation, a hash-verified core primitive registry, custom primitive validation, a hash-verified five-profile threshold registry, deterministic profile-owned label/spacing refinement, semantic density gating, presentation safe-margin gating, profile motion-envelope validation, left-right/top-down layout with orthogonal routing, and deterministic semantic motion compilation/evaluation for state effects and `reveal`, `focus`, `transfer`, `trace`, and `morph-state` cues.
+The installed runtime supports semantic validation, a hash-verified core primitive registry, custom primitive validation, a hash-verified five-profile threshold registry, deterministic profile-owned label/spacing refinement, semantic density gating, presentation safe-margin gating, profile motion-envelope validation, left-right/top-down layout with orthogonal routing, deterministic static SVG rendering for all bundled core primitive families, rendered SVG audits for explicit typography/stroke/contrast/grayscale/purity evidence, and deterministic semantic motion compilation/evaluation for state effects and `reveal`, `focus`, `transfer`, `trace`, and `morph-state` cues.
 
-Exact browser glyph metrics, final stroke/contrast/grayscale proof, topology-specific radial solving, final SVG rendering, and export are not yet available. When one of those checks is required, fail closed or preserve it as renderer/audit evidence rather than pretending the current deterministic approximation is final rendered proof.
+Browser-resolved glyph extents and font fallback identity, topology-specific radial solving, animated HTML runtime composition, and final export packaging are not yet available. When one of those checks is required, fail closed or preserve it as explicit audit evidence rather than pretending the current deterministic renderer has proved it.
