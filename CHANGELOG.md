@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.0 — D-003 deterministic semantic motion
+
+- added MotionSpec schema/template/example and skill-local motion CLI
+- added promoted-layout-only motion validation, deterministic event scheduling, state-domain effects, and cue compilation
+- added event-sourced seeking that never reads the previous DOM frame
+- resolved transfer/trace geometry exclusively from promoted ResolvedLayout routes
+- added repeat-loop semantic closure, static-summary behavior, purity checks, and MOT diagnostics
+- added immutable MotionProgram promotion receipts and deterministic program hashes
+- extended CI and regression coverage across semantic, layout, and motion promotion gates
+- strengthened agent-facing cleanup so public prose omits both internal D-* roadmap codes and contract version labels
+
 ## 0.2.1 — agent-facing boundary cleanup
 
 - removed internal roadmap codes and implementation-slice language from `skills/figthread/`
