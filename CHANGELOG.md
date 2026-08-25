@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.5.0 — D-005 profile thresholds
+
+- added a content-hashed five-profile threshold registry
+- added ProfilePlan compilation/promotion with immutable receipts and deterministic threshold identity
+- added weighted semantic density accounting, hard ceilings, and deterministic soft-budget escalation
+- added deterministic profile-owned label measurement refinement that can only strengthen primitive minimums
+- added profile spacing floors and presentation safe-margin enforcement
+- bound profile registry/threshold/plan identity into LayoutIntent, ResolvedLayout, and layout promotion receipts
+- added profile motion-envelope validation for cue duration, semantic-beat dwell, repeat policy/duration, and simultaneous moving groups
+- routed layout and motion CLIs through explicit profile promotion
+- added a skill-local profile CLI, profile reference, schema, root mirrors, and runtime re-exports
+- expanded CI and regression coverage across semantic → visual → profile → layout → motion promotion
+- documented exact glyph/stroke/contrast/grayscale proof as renderer-owned evidence rather than fabricated runtime output
+
 ## 0.4.0 — D-004 visual primitives
 
 - added VisualSpec schema/template/example and skill-local visual CLI
