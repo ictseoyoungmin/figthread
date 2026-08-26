@@ -28,6 +28,7 @@ test("reopen advances every started descendant revision and never reuses r0001",
 
   const reopened = await reopenStage(run, "figure-ir", "review exposed an upstream wording cause");
   assert.equal(reopened.revision, 2);
+  assert.ok(reopened.invalidated.every((entry) => entry.reopen_revision === 2));
   const manifest = JSON.parse(await readFile(join(run, "run.json"), "utf8"));
   for (const stage of ["figure-ir", "grammar-visual", "layout", "motion", "document", "review", "export"]) assert.equal(manifest.revisions[stage], 2, `${stage} must advance to r0002`);
 
