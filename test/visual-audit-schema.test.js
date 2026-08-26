@@ -4,13 +4,16 @@ import test from "node:test";
 
 const read = (path) => readFile(new URL(path, import.meta.url), "utf8");
 
-test("visual audit schema and custom fixture mirrors stay byte-identical", async () => {
-  const [skillSchema, rootSchema, skillExample, rootExample] = await Promise.all([
+test("visual audit runtime, schema, and custom fixture mirrors stay byte-identical", async () => {
+  const [skillRuntime, rootRuntime, skillSchema, rootSchema, skillExample, rootExample] = await Promise.all([
+    read("../skills/figthread/runtime/visual-audit.js"),
+    read("../src/visual-audit.js"),
     read("../skills/figthread/schemas/visual-audit-evidence.schema.json"),
     read("../schemas/visual-audit-evidence.schema.json"),
     read("../skills/figthread/examples/visual-audit-custom.visual.json"),
     read("../examples/visual-audit-custom.visual.json")
   ]);
+  assert.equal(skillRuntime, rootRuntime);
   assert.equal(skillSchema, rootSchema);
   assert.equal(skillExample, rootExample);
   const parsed = JSON.parse(skillExample);
