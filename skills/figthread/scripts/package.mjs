@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 import { readFile, writeFile } from "node:fs/promises";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
+import { validateStructure } from "../runtime/schema-validator.js";
 import { promoteFigureSpec } from "../runtime/validator.js";
 import { promoteGrammarPlan } from "../runtime/grammar.js";
 import { promoteVisualSpec } from "../runtime/visual.js";
@@ -11,13 +14,14 @@ import { promoteProfileMotionProgram } from "../runtime/profile-motion.js";
 import { promoteFigthreadDocument } from "../runtime/document.js";
 import { composeFigthreadPackage, promoteFigthreadPackage } from "../runtime/document-package.js";
 
+const requestSchema=JSON.parse(readFileSync(fileURLToPath(new URL("../schemas/package-request.schema.json",import.meta.url)),"utf8"));
 function usage(){console.error("usage: package.mjs <figure-spec.json> <visual-spec.json> <package-request.json> [motion-spec.json] [--mode draft|gate] [--promote] [--out figure.package.html]");}
 const args=process.argv.slice(2),promote=args.includes("--promote"),modeIndex=args.indexOf("--mode"),outIndex=args.indexOf("--out"),mode=modeIndex>=0?args[modeIndex+1]:"gate";
 const valueIndexes=new Set([modeIndex+1,outIndex+1].filter(i=>i>0)),flags=new Set(["--promote","--mode","--out"]),positional=args.filter((arg,index)=>!flags.has(arg)&&!valueIndexes.has(index));
 if(![3,4].includes(positional.length)||!["draft","gate"].includes(mode)||(outIndex>=0&&!args[outIndex+1])){usage();process.exitCode=2;}else{
   try{
     const [figure,visual,request,globalMotion=null]=await Promise.all(positional.map(file=>readFile(resolve(file),"utf8").then(JSON.parse)));
-    if(request?.schema_version!=="figthread.package-request/0.1"||typeof request.id!=="string"||!Array.isArray(request.targets)||request.targets.length<2)throw new Error("package request must contain id and at least two targets");
+    const requestIssues=validateStructure(request,requestSchema);if(requestIssues.length)throw new Error(`package request ${requestIssues[0].path}: ${requestIssues[0].message}`);
     const childPromotions=[];
     for(const [index,entry] of request.targets.entries()){
       const target=entry?.layout_target;
