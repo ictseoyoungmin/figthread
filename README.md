@@ -1,6 +1,6 @@
 # Figthread
 
-Figthread is a semantic figure authoring system. The implementation now covers eight promoted slices:
+Figthread is a semantic figure authoring system. The implementation now covers nine promoted slices:
 
 - **D-001** — FigureSpec structural + semantic gate
 - **D-002** — LayoutIntent + deterministic ResolvedLayout gate
@@ -10,8 +10,9 @@ Figthread is a semantic figure authoring system. The implementation now covers e
 - **D-006** — deterministic static SVG renderer + rendered-profile evidence gate
 - **D-007** — canonical figure grammar registry + GrammarPlan gate
 - **D-008** — self-contained FigthreadDocument + fail-closed browser runtime gate
+- **D-009** — content-addressed HTML/SVG export + browser-evidenced PNG capture gate
 
-Browser-resolved glyph extent proof, topology-specific radial solving, multi-target packaging, PNG/export derivatives, and run-directory execution packaging remain downstream slices.
+Browser-resolved glyph extent proof, topology-specific radial solving, multi-target packaging, and run-directory execution packaging remain downstream slices.
 
 ## Source of truth
 
@@ -29,6 +30,7 @@ The installable skill is self-contained under `skills/figthread/` and is the imp
 - `skills/figthread/schemas/layout-request.schema.json` — internal measurement bridge used by the base solver
 - `skills/figthread/schemas/motion-spec.schema.json` — semantic motion contract
 - `skills/figthread/schemas/document-manifest.schema.json` — self-contained document manifest contract
+- `skills/figthread/schemas/export-spec.schema.json` — derivative export request contract
 - `skills/figthread/runtime/validator.js` — D-001 promotion
 - `skills/figthread/runtime/grammar.js` — D-007 grammar validation, topology checks, and GrammarPlan promotion
 - `skills/figthread/runtime/visual.js` — D-004 primitive binding/promotion
@@ -39,6 +41,7 @@ The installable skill is self-contained under `skills/figthread/` and is the imp
 - `skills/figthread/runtime/profile-motion.js` — profile-envelope motion adapter
 - `skills/figthread/runtime/motion.js` — D-003 semantic motion validator/compiler/evaluator/promotion
 - `skills/figthread/runtime/document.js` — D-008 manifest/hash-chain compiler and embedded browser runtime
+- `skills/figthread/runtime/export.js` — D-009 export planning, text/vector derivatives, PNG capture evidence, and artifact promotion
 - `skills/figthread/scripts/*.mjs` — skill-local CLIs
 - `skills/figthread/references/` — agent-facing normative behavior without internal roadmap labels or contract-version labels
 
@@ -56,9 +59,10 @@ FigureSpec
   -> D-006 gate -> rendered_svg + rendered-profile evidence
   -> optional MotionSpec + profile envelope -> D-003 gate -> MotionProgram
   -> D-008 gate -> self-contained FigthreadDocument HTML
+  -> ExportSpec -> D-009 gate -> ExportArtifact
 ```
 
-The document stage does not reinterpret the figure. It embeds canonical input, promoted compiled authority, the certified static SVG, and the optional MotionProgram into a deterministic single-target HTML runtime. Canonical payload hash, compile key, manifest build hash, and exact HTML hash remain distinct.
+The export stage is derivative-only. It binds ExportSpec to the promoted document/render hashes and may package exact HTML, derive a vector-safe static-summary SVG, or accept a browser-captured PNG with deterministic state and environment evidence. It cannot change semantic or geometry authority.
 
 ## Commands
 
@@ -77,23 +81,25 @@ npm run layout:promote -- skills/figthread/examples/minimal.figure.json skills/f
 npm run render:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json --out figure.svg --evidence evidence.json
 npm run motion:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json skills/figthread/examples/minimal.motion.json
 npm run document:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json skills/figthread/examples/minimal.motion.json --out figure.html
+npm run export:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json skills/figthread/examples/minimal.motion.json skills/figthread/examples/minimal.export.json --out figure.svg
 ```
 
-Omit the motion input from `document`/`document:promote` to produce a static self-contained document. Use `--runtime-mode interactive|clean|static` to choose initial view state without changing semantic authority.
+Omit the motion input from `document`/`document:promote` and `export`/`export:promote` when the figure has no motion. PNG promotion is adapter-driven: without a browser capture adapter, the runtime returns the deterministic capture plan and fails promotion rather than inventing a second raster renderer.
 
-## D-008 guarantees
+## D-009 guarantees
 
-- one deterministic self-contained HTML document for one promoted target
-- separate canonical-input hash, compiled-authority compile key, document build hash, and exact HTML hash
-- matching semantic, grammar, visual, profile, layout, render, and optional motion authority checks before composition
-- embedded static SVG comes from the promoted renderer and is never hand-patched by the document compiler
-- embedded MotionProgram remains geometry-bound to the promoted layout
-- fail-closed browser bootstrap verifies manifest schema, build hash, canonical hash, compile key, target identity, SVG viewport, and external-dependency boundary before reporting ready
-- runtime modes: interactive, clean, static, and fail-closed error
-- event-sourced seeking from MotionProgram initial semantic state
-- runtime projection for reveal, focus, trace, transfer, and morph-state cues without creating canonical geometry
-- stable browser inspection surface: `getStatus`, `listTargets`, `activateTarget`, `renderAt`, `setMode`, `prepareExport`, `getStateHash`, and `getDiagnostics`
-- static/reduced-motion/export preparation uses the semantic summary state rather than an arbitrary motion frame
-- no external scripts, stylesheets, iframes, embedded objects, or network I/O in the runtime
+- ExportSpec is structurally and semantically validated against the exact promoted document target/profile
+- ExportPlan binds request hash, canonical hash, compile key, document build/HTML hash, rendered SVG/render hash, motion-program hash, target, frame, scale, background, and live-text policy
+- HTML export is the exact promoted self-contained document bytes
+- default SVG export is byte-identical to the promoted rendered SVG
+- SVG scale/background changes affect only derivative presentation; viewBox and promoted layout authority remain unchanged
+- vector export fails on scripts, foreign objects, raster images, external references, or other non-vector-safe constructs
+- PNG is never generated by a second Figthread raster renderer
+- PNG capture plan fixes selector, semantic frame, expected state hash, expected local time, pixel dimensions, background, and scale
+- PNG promotion verifies signature/chunk structure, chunk CRCs, exact dimensions, preparation evidence, source hashes, semantic state hash, and browser/font/environment fingerprint
+- HTML/SVG determinism scope is exact bytes for identical promoted input/request
+- PNG records a content hash and same-input/same-environment visual determinism scope without claiming cross-platform binary identity
+- immutable ExportPlan, ExportArtifact, and export promotion receipt
+- agent-facing prose remains free of internal roadmap codes and public contract-version labels
 
-The next bottleneck is export closure: turn the canonical HTML and certified static SVG into explicitly requested deterministic derivatives without allowing export tooling to become a second layout or rendering authority.
+The next bottleneck is workspace/execution closure: make promotion receipts, reopen boundaries, resume checkpoints, and exact artifact evidence durable in a run directory so a fresh worker can resume without conversation history.

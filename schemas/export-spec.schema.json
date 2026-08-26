@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://figthread.dev/schemas/export-spec/0.1",
+  "title": "Figthread export specification",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "document_id", "target_id", "profile", "format", "frame", "background", "scale", "live_text", "extensions"],
+  "properties": {
+    "schema_version": { "const": "figthread.export/0.1" },
+    "id": { "type": "string", "pattern": "^export:[a-z0-9][a-z0-9._-]*$" },
+    "document_id": { "type": "string", "pattern": "^document:[a-z0-9][a-z0-9._-]*$" },
+    "target_id": { "type": "string", "minLength": 1 },
+    "profile": { "type": "string", "enum": ["paper", "paper-animated", "presentation", "technical-explainer", "infographic"] },
+    "format": { "type": "string", "enum": ["html", "svg", "png"] },
+    "frame": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": { "type": "string", "enum": ["document", "static-summary", "time"] },
+        "time_ms": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "background": { "type": "string", "pattern": "^(?:profile|transparent|#[0-9A-Fa-f]{6})$" },
+    "scale": { "enum": [1, 2, 3, 4] },
+    "live_text": { "type": "boolean" },
+    "extensions": {
+      "type": "object",
+      "propertyNames": { "pattern": "^[a-z][a-z0-9-]*(?:\\.[a-z0-9-]+)+$" },
+      "additionalProperties": true
+    }
+  }
+}

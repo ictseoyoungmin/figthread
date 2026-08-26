@@ -1,0 +1,13 @@
+{
+  "schema_version": "figthread.export/0.1",
+  "id": "export:main",
+  "document_id": "document:main",
+  "target_id": "web-wide",
+  "profile": "technical-explainer",
+  "format": "svg",
+  "frame": { "kind": "static-summary" },
+  "background": "profile",
+  "scale": 1,
+  "live_text": true,
+  "extensions": {}
+}

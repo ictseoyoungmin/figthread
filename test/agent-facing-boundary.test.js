@@ -6,7 +6,7 @@ import test from "node:test";
 const skillRoot = new URL("../skills/figthread/", import.meta.url);
 const textExtensions = new Set([".md", ".json", ".yaml", ".yml", ".js", ".mjs", ".svg"]);
 const internalRoadmapCode = /\bD-\d{3}\b/g;
-const publicContractVersionLabel = /\b(?:FigureSpec|GrammarDefinition|GrammarPlan|VisualSpec|PrimitiveDefinition|PrimitivePlan|ProfilePlan|MotionSpec|LayoutIntent|ResolvedLayout|LayoutRequest|LayoutTarget|MotionProgram|RenderedSvg|FigthreadDocument|DocumentManifest)\s+v?\d+\.\d+\b/g;
+const publicContractVersionLabel = /\b(?:FigureSpec|GrammarDefinition|GrammarPlan|VisualSpec|PrimitiveDefinition|PrimitivePlan|ProfilePlan|MotionSpec|LayoutIntent|ResolvedLayout|LayoutRequest|LayoutTarget|MotionProgram|RenderedSvg|FigthreadDocument|DocumentManifest|ExportSpec|ExportPlan|ExportArtifact)\s+v?\d+\.\d+\b/g;
 
 async function collectTextFiles(directoryUrl, files = []) {
   const entries = await readdir(directoryUrl, { withFileTypes: true });
