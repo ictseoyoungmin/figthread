@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.4.0 — installed browser PNG capture
+
+- added a bundled zero-dependency Chrome/Chromium DevTools-pipe PNG capture adapter over exact promoted self-contained HTML
+- wired PNG promotion into the installed export CLI with automatic browser discovery plus `FIGTHREAD_CHROME` / `--browser` override support
+- kept the capture adapter derivative-only: it prepares semantic runtime state, removes host-page scaling/padding from the capture projection, and never recalculates promoted layout geometry
+- added static-summary and event-sourced time-frame capture paths bound to target/build/SVG/frame/state evidence
+- added export-only profile/transparent/explicit background projection and exact integer 1x–4x screenshot scaling
+- collected actual Chrome product/version/revision/protocol, OS/platform, device scale factor, and platform-font fingerprint evidence for promoted PNG artifacts
+- reused existing fail-closed PNG signature/chunk CRC/dimension/source/state/environment validation before ExportArtifact promotion
+- added a canonical PNG export example, root runtime/example mirrors, real-Chrome CLI regression coverage, and a Node 20/22 PNG promotion hard gate
+- documented same-input/same-browser-font-environment visual determinism without claiming cross-platform screenshot byte identity
+- bumped package, installed skill, Claude plugin, and Codex plugin metadata to 1.4.0
+
 ## 1.3.0 — deterministic topology-specific radial layout
 
 - added a deterministic radial solver without force-directed placement, randomness, browser auto-layout, or hidden solver seeds
