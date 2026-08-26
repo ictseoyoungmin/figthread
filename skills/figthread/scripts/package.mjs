@@ -33,7 +33,7 @@ if(![3,4].includes(positional.length)||!["draft","gate"].includes(mode)||(outInd
       const renderPromotion=promoteRenderedSvg(figurePromotion,visualPromotion,profilePromotion,layoutPromotion);if(!renderPromotion.promoted)fail("render",renderPromotion);
       const selectedMotion=Object.prototype.hasOwnProperty.call(entry,"motion")?entry.motion:globalMotion;
       const motionPromotion=selectedMotion?promoteProfileMotionProgram(figurePromotion,profilePromotion,layoutPromotion,selectedMotion):null;if(selectedMotion&&!motionPromotion.promoted)fail("motion",motionPromotion);
-      const childMode=entry.runtime_mode??request.child_runtime_mode??"interactive";
+      const childMode=entry.runtime_mode??request.child_runtime_mode??request.initial_mode??"interactive";
       const documentPromotion=promoteFigthreadDocument({figurePromotion,grammarPromotion,visualPromotion,profilePromotion,layoutPromotion,renderPromotion,motionPromotion},{figure:variantFigure,visual,target,motion:selectedMotion},{initialMode:childMode});
       if(!documentPromotion.promoted)fail("document",documentPromotion);
       childPromotions.push(documentPromotion);
