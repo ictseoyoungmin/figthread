@@ -1,6 +1,6 @@
 # Figthread
 
-Figthread is a semantic figure authoring system. The implementation now covers seven promoted slices:
+Figthread is a semantic figure authoring system. The implementation now covers eight promoted slices:
 
 - **D-001** — FigureSpec structural + semantic gate
 - **D-002** — LayoutIntent + deterministic ResolvedLayout gate
@@ -9,8 +9,9 @@ Figthread is a semantic figure authoring system. The implementation now covers s
 - **D-005** — profile threshold registry + ProfilePlan gate
 - **D-006** — deterministic static SVG renderer + rendered-profile evidence gate
 - **D-007** — canonical figure grammar registry + GrammarPlan gate
+- **D-008** — self-contained FigthreadDocument + fail-closed browser runtime gate
 
-Browser-resolved glyph extent proof, animated HTML runtime composition, export packaging, and full document/runtime packaging remain downstream slices.
+Browser-resolved glyph extent proof, topology-specific radial solving, multi-target packaging, PNG/export derivatives, and run-directory execution packaging remain downstream slices.
 
 ## Source of truth
 
@@ -27,6 +28,7 @@ The installable skill is self-contained under `skills/figthread/` and is the imp
 - `skills/figthread/schemas/layout-target.schema.json` — public layout target contract
 - `skills/figthread/schemas/layout-request.schema.json` — internal measurement bridge used by the base solver
 - `skills/figthread/schemas/motion-spec.schema.json` — semantic motion contract
+- `skills/figthread/schemas/document-manifest.schema.json` — self-contained document manifest contract
 - `skills/figthread/runtime/validator.js` — D-001 promotion
 - `skills/figthread/runtime/grammar.js` — D-007 grammar validation, topology checks, and GrammarPlan promotion
 - `skills/figthread/runtime/visual.js` — D-004 primitive binding/promotion
@@ -36,6 +38,7 @@ The installable skill is self-contained under `skills/figthread/` and is the imp
 - `skills/figthread/runtime/renderer.js` — D-006 deterministic static SVG renderer and rendered-profile audit
 - `skills/figthread/runtime/profile-motion.js` — profile-envelope motion adapter
 - `skills/figthread/runtime/motion.js` — D-003 semantic motion validator/compiler/evaluator/promotion
+- `skills/figthread/runtime/document.js` — D-008 manifest/hash-chain compiler and embedded browser runtime
 - `skills/figthread/scripts/*.mjs` — skill-local CLIs
 - `skills/figthread/references/` — agent-facing normative behavior without internal roadmap labels or contract-version labels
 
@@ -51,10 +54,11 @@ FigureSpec
   -> target + profile registry -> D-005 gate -> ProfilePlan
   -> D-002 gate -> ResolvedLayout
   -> D-006 gate -> rendered_svg + rendered-profile evidence
-  -> MotionSpec + profile envelope -> D-003 gate -> MotionProgram
+  -> optional MotionSpec + profile envelope -> D-003 gate -> MotionProgram
+  -> D-008 gate -> self-contained FigthreadDocument HTML
 ```
 
-`figure_type` is no longer descriptive metadata. It must resolve through the content-hashed grammar registry, satisfy registered role/cardinality/topology/order/split rules, and produce a promoted GrammarPlan. Layout identity now includes the grammar registry, selected definition, and grammar-plan hashes.
+The document stage does not reinterpret the figure. It embeds canonical input, promoted compiled authority, the certified static SVG, and the optional MotionProgram into a deterministic single-target HTML runtime. Canonical payload hash, compile key, manifest build hash, and exact HTML hash remain distinct.
 
 ## Commands
 
@@ -71,28 +75,25 @@ npm run profile:promote -- skills/figthread/examples/minimal.figure.json skills/
 npm run layout -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json
 npm run layout:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json
 npm run render:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json --out figure.svg --evidence evidence.json
-npm run motion -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json skills/figthread/examples/minimal.motion.json
 npm run motion:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json skills/figthread/examples/minimal.motion.json
+npm run document:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json skills/figthread/examples/minimal.motion.json --out figure.html
 ```
 
-## D-007 guarantees
+Omit the motion input from `document`/`document:promote` to produce a static self-contained document. Use `--runtime-mode interactive|clean|static` to choose initial view state without changing semantic authority.
 
-- exactly twelve canonical root grammars: comparison, architecture, pipeline, mechanism, state-transition, timeline, network, hierarchy, swimlane, lifecycle, dataflow, and multi-panel
-- content-hashed grammar registry and selected-definition identity
-- required role/cardinality validation with ordered node bindings
-- registered variant and reading-axis validation
-- grammar-specific relation vocabulary and hybrid detection
-- deterministic cycle/connectivity checks where the grammar requires them
-- pipeline branch/merge limits and direct linear-stage flow
-- state-transition semantic-state enforcement
-- hierarchy single-parent/root/connectivity checks
-- swimlane lane ownership checks
-- lifecycle explicit semantic closure
-- dataflow role disjointness/provenance participation
-- multi-panel direct-child and cross-panel relation rules
-- grammar split caps that fail instead of shrinking layout
-- immutable GrammarPlan and promotion receipt
-- grammar registry/definition/plan identity bound into LayoutIntent, ResolvedLayout, and layout promotion receipts
-- all agent-facing layout/render/motion CLIs route through grammar promotion
+## D-008 guarantees
 
-The next closure slice should compose promoted static rendering and MotionProgram into a self-contained interactive HTML runtime without allowing DOM/CSS state to become semantic or geometry authority.
+- one deterministic self-contained HTML document for one promoted target
+- separate canonical-input hash, compiled-authority compile key, document build hash, and exact HTML hash
+- matching semantic, grammar, visual, profile, layout, render, and optional motion authority checks before composition
+- embedded static SVG comes from the promoted renderer and is never hand-patched by the document compiler
+- embedded MotionProgram remains geometry-bound to the promoted layout
+- fail-closed browser bootstrap verifies manifest schema, build hash, canonical hash, compile key, target identity, SVG viewport, and external-dependency boundary before reporting ready
+- runtime modes: interactive, clean, static, and fail-closed error
+- event-sourced seeking from MotionProgram initial semantic state
+- runtime projection for reveal, focus, trace, transfer, and morph-state cues without creating canonical geometry
+- stable browser inspection surface: `getStatus`, `listTargets`, `activateTarget`, `renderAt`, `setMode`, `prepareExport`, `getStateHash`, and `getDiagnostics`
+- static/reduced-motion/export preparation uses the semantic summary state rather than an arbitrary motion frame
+- no external scripts, stylesheets, iframes, embedded objects, or network I/O in the runtime
+
+The next bottleneck is export closure: turn the canonical HTML and certified static SVG into explicitly requested deterministic derivatives without allowing export tooling to become a second layout or rendering authority.
