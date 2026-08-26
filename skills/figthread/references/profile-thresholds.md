@@ -54,7 +54,7 @@ The current runtime does not ask the agent to author font measurements. Instead 
 5. raise preferred size when needed so preferred size never falls below the strengthened minimum;
 6. hash the resulting measurement set into the promoted profile plan.
 
-This bridge is intentionally conservative and deterministic. It is not a claim that the final font has been raster-measured. Exact glyph metrics, line wrapping, stroke rendering, contrast, grayscale, and final placement-size proof remain renderer-owned evidence and must fail closed when a later stage requires evidence that the installed runtime cannot yet produce.
+This bridge is intentionally conservative and deterministic. It is not a claim that a browser has shaped the final glyphs. The static renderer separately certifies serialized SVG font size, stroke, contrast, grayscale, and purity. Browser text review then measures the exact promoted SVG in Chrome/Chromium and certifies actual glyph bounds, visibility, overflow/overlap, and platform-font identity for the recorded environment. Neither evidence stage may mutate profile or layout authority to manufacture a pass.
 
 ## Spacing floor
 
@@ -86,7 +86,7 @@ Profile failures use `PRF` diagnostics.
 - `PRF006_DENSITY` — semantic or relation density exceeds soft/hard budgets.
 - `PRF007_MOTION` — motion violates the selected profile envelope.
 
-Other reserved profile diagnostics are not repurposed as shortcuts for renderer checks that do not yet exist.
+Other reserved profile diagnostics are not repurposed as shortcuts for renderer or browser checks.
 
 Repair at the owning stage:
 
@@ -94,6 +94,7 @@ Repair at the owning stage:
 - density → grammar/hierarchy/claim compression;
 - spacing → layout target;
 - motion envelope → motion storyboard;
-- exact font/stroke/contrast/grayscale proof → renderer/audit when that capability exists.
+- serialized font/stroke/contrast/grayscale proof → renderer;
+- browser-shaped glyph bounds, overflow/overlap, and platform-font proof → browser text review, reopening copy/measurement/profile/layout if it fails.
 
-Do not patch exported pixels or renderer offsets to hide a profile-gate failure.
+Do not patch exported pixels, browser measurements, or renderer offsets to hide a profile-gate failure.
