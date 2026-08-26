@@ -1,0 +1,27 @@
+{
+  "schema_version": "figthread.visual/0.1",
+  "figure_id": "fig:minimal-pipeline",
+  "registry_hash": "sha256:51a4be6295cbe6994f7c9af00e512ef25183227161a5ebc91e12d15011cdb684",
+  "bindings": [
+    { "node_id": "node:root", "primitive": "core.frame@0.1", "variant": "panel", "salience": "S0", "props": {}, "state_bindings": {} },
+    { "node_id": "node:input", "primitive": "custom.audit-card@0.1", "variant": "main", "salience": "S1", "props": {}, "state_bindings": {} },
+    { "node_id": "node:queue", "primitive": "core.queue@0.1", "variant": "fifo", "salience": "S1", "props": { "capacity": 4 }, "state_bindings": { "occupancy": "state:queue-count" } },
+    { "node_id": "node:output", "primitive": "core.artifact@0.1", "variant": "payload", "salience": "S1", "props": {}, "state_bindings": {} }
+  ],
+  "custom_definitions": [
+    {
+      "id": "custom.audit-card@0.1",
+      "class": "mechanism",
+      "renderer": "svg",
+      "variants": ["main"],
+      "view_box": [0, 0, 120, 80],
+      "intrinsic": { "min_w": 100, "min_h": 60, "pref_w": 120, "pref_h": 80, "aspect_policy": "free" },
+      "ports": ["north", "east", "south", "west"],
+      "slots": ["body", "label"],
+      "state_channels": [],
+      "tokens": ["ink"],
+      "local_svg": "<g><rect x=\"2\" y=\"2\" width=\"116\" height=\"76\" rx=\"6\" fill=\"none\" stroke=\"#1f2328\" stroke-width=\"1.5\" data-figthread-audit=\"container\"/><text x=\"60\" y=\"18\" text-anchor=\"middle\" font-family=\"ui-sans-serif,system-ui,sans-serif\" font-size=\"15\" font-weight=\"550\" fill=\"#1f2328\">detail</text><circle cx=\"20\" cy=\"62\" r=\"6\" fill=\"none\" stroke=\"#1f2328\" stroke-width=\"1.5\" data-essential=\"true\"/><line x1=\"35\" y1=\"62\" x2=\"82\" y2=\"62\" stroke=\"#667085\" stroke-width=\"1.5\" data-figthread-audit=\"decorative\"/></g>"
+    }
+  ],
+  "extensions": {}
+}

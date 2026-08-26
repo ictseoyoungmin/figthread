@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.5.0 — browser-resolved full-SVG visual audit
+
+- added a content-addressed visual-audit plan, browser observation, promoted evidence record, and immutable promotion receipt over exact promoted figure, visual, profile, layout, render, SVG, target, and browser identities
+- added a zero-dependency Chrome/Chromium DevTools-pipe adapter that measures the exact promoted static SVG without becoming semantic, primitive, layout, or renderer authority
+- expanded browser evidence coverage from semantic primary labels to every custom-primitive text element, every classified visible custom geometry leaf, and every promoted relation connector
+- added explicit custom geometry roles for `container`, `essential`, `connector`, and `decorative`, while preserving `data-essential="true"` as an essential-mark compatibility path
+- made unclassified or unsupported visible custom geometry fail closed instead of remaining outside evidence coverage
+- added browser-resolved owner/viewport containment, internal text padding, visibility, platform-font glyph attribution, text-to-text collision, text-to-protected-mark collision, and connector-clearance checks
+- added `AUD001`–`AUD010` diagnostics with upstream reopen guidance instead of downstream geometry repair
+- added `visual:audit` / `visual:audit:promote` CLI commands, installed/root runtime and schema mirrors, generalized custom audit fixture, and regression coverage
+- made the Node 20/22 CI hard gate run a real Chrome audit over custom internal text and classified custom geometry
+- extended installed skill guidance, repository documentation, boundary guards, package metadata, and Claude/Codex plugin metadata to 1.5.0 using generalized capability language
+
 ## 1.4.0 — installed browser PNG capture
 
 - added a bundled zero-dependency Chrome/Chromium DevTools-pipe PNG capture adapter over exact promoted self-contained HTML

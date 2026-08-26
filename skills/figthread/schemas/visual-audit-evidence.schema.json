@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://figthread.dev/schemas/visual-audit-evidence/0.1",
+  "title": "Figthread Visual Audit Evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "plan_hash", "observation_hash", "environment_hash", "figure_hash", "visual_hash", "primitive_plan_hash", "profile_plan_hash", "layout_hash", "render_hash", "svg_hash", "target_id", "metrics", "evidence_hash"],
+  "properties": {
+    "schema_version": {"const": "figthread.visual-audit-evidence/0.1"},
+    "plan_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "observation_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "environment_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "figure_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "visual_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "primitive_plan_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "profile_plan_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "layout_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "render_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "svg_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "target_id": {"type": "string", "minLength": 1},
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["element_count", "text_count", "custom_element_count", "connector_count", "platform_font_families", "full_text_coverage_certified", "custom_geometry_coverage_certified", "owner_bounds_certified", "text_collision_certified", "connector_clearance_certified", "bounds_failure_count", "collision_failure_count"],
+      "properties": {
+        "element_count": {"type": "integer", "minimum": 0},
+        "text_count": {"type": "integer", "minimum": 0},
+        "custom_element_count": {"type": "integer", "minimum": 0},
+        "connector_count": {"type": "integer", "minimum": 0},
+        "platform_font_families": {"type": "array", "items": {"type": "string"}},
+        "full_text_coverage_certified": {"type": "boolean"},
+        "custom_geometry_coverage_certified": {"type": "boolean"},
+        "owner_bounds_certified": {"type": "boolean"},
+        "text_collision_certified": {"type": "boolean"},
+        "connector_clearance_certified": {"type": "boolean"},
+        "bounds_failure_count": {"type": "integer", "minimum": 0},
+        "collision_failure_count": {"type": "integer", "minimum": 0}
+      }
+    },
+    "evidence_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}
