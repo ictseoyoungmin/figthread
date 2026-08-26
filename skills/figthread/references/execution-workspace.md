@@ -26,7 +26,7 @@ run-<date>-<source8>/
 └── tmp/
 ```
 
-Each active stage has a revision directory such as `stages/03-figure-ir/r0001/`. Reopening creates a new revision rather than modifying promoted history.
+Each active stage has a revision directory such as `stages/03-figure-ir/r0001/`. Reopening creates a new causal revision rather than modifying promoted history.
 
 ## Stage order
 
@@ -64,7 +64,7 @@ A worker must be able to continue from this packet and the run directory without
 
 ## Promoting a stage
 
-Write the stage outputs inside the reported active revision directory. Put review evidence inside the run directory, normally under `evidence/`. Then promote:
+Write the stage outputs inside the reported active revision directory. Put review evidence inside the run directory, normally under `evidence/` or the active revision directory. Then promote:
 
 ```bash
 node <skill-root>/scripts/workspace.mjs promote <run-dir> <stage> \
@@ -93,7 +93,9 @@ When review finds an earlier cause, reopen the earliest causal stage:
 node <skill-root>/scripts/workspace.mjs reopen <run-dir> <stage> --reason "<cause>"
 ```
 
-Reopen never patches promoted history. It creates the next revision for the selected stage, removes that stage and all descendants from the active receipt chain, records the invalidated receipt hashes, and leaves their files in place for audit.
+Reopen never patches promoted history. It removes the selected stage and all promoted descendants from the active receipt chain, records their invalidated receipt hashes, and leaves all prior files in place for audit.
+
+Every affected stage that has already started advances to a new revision directory. This includes an unpromoted downstream frontier whose revision directory already exists. A stage that has genuinely never started remains at revision zero and still begins at `r0001` when first reached. This rule prevents reopened work from ever reusing a prior `r0001`, `r0002`, or later directory.
 
 If verification discovers changed artifact or evidence bytes, `resume` reports the earliest invalid stage. Reopen at that stage or an earlier causal stage. Reopening a later stage is rejected.
 
