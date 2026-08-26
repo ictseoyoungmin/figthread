@@ -1,6 +1,6 @@
 schema: hadara.skill/v0.1
 name: figthread
-version: 1.0.0
+version: 1.0.1
 description: >-
   Design and validate semantic figures through promoted semantic state,
   canonical figure grammar, primitive-bound visual structure,

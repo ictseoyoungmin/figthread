@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.1 — full execution dogfood hardening
+
+- added a repository benchmark that drives source understanding through claims, semantic promotion, grammar/visual, profile/layout/render, motion, document, exact artifact review, causal reopen, repaired descendants, and export
+- split the benchmark across two Node processes so the second worker must resume from run-directory state rather than process memory
+- made the first review deliberately expose a source-wording defect that passes core gates, proving the need for exact artifact review and upstream reopen
+- fixed reopen revision reuse: every already-started affected descendant, including an unpromoted frontier, now advances to a new revision instead of reusing an older directory
+- added targeted regression coverage that preserves prior revision bytes and forbids downstream `r0001` reuse after causal reopen
+- added a receipt-bound dogfood report and developer finding record
+- added `npm run benchmark:dogfood` and CI coverage on Node 20 and 22
+- bumped package, installed skill, Claude plugin, and Codex plugin metadata to 1.0.1
+
 ## 1.0.0 — D-010 workspace / execution closure
 
 - added a durable run-directory protocol that treats filesystem state as external memory for long-running figure work
