@@ -1,0 +1,31 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import test from "node:test";
+import { promoteFigureSpec } from "../skills/figthread/runtime/validator.js";
+import { promoteGrammarPlan } from "../skills/figthread/runtime/grammar.js";
+import { promoteVisualSpec } from "../skills/figthread/runtime/visual.js";
+import { promoteProfilePlan } from "../skills/figthread/runtime/profile.js";
+import { promoteProfileLayout } from "../skills/figthread/runtime/visual-layout.js";
+import { promoteRenderedSvg } from "../skills/figthread/runtime/renderer.js";
+import { promoteProfileMotionProgram } from "../skills/figthread/runtime/profile-motion.js";
+import { composeFigthreadDocument, promoteFigthreadDocument } from "../skills/figthread/runtime/document.js";
+
+const figure=JSON.parse(await readFile(new URL("../skills/figthread/examples/minimal.figure.json",import.meta.url),"utf8"));
+const visual=JSON.parse(await readFile(new URL("../skills/figthread/examples/minimal.visual.json",import.meta.url),"utf8"));
+const target=JSON.parse(await readFile(new URL("../skills/figthread/examples/minimal.layout-target.json",import.meta.url),"utf8"));
+const motion=JSON.parse(await readFile(new URL("../skills/figthread/examples/minimal.motion.json",import.meta.url),"utf8"));
+function chain(withMotion=true){const figurePromotion=promoteFigureSpec(figure);assert.equal(figurePromotion.promoted,true);const grammarPromotion=promoteGrammarPlan(figurePromotion);assert.equal(grammarPromotion.promoted,true);const visualPromotion=promoteVisualSpec(figurePromotion,visual);assert.equal(visualPromotion.promoted,true);const profilePromotion=promoteProfilePlan(figurePromotion,visualPromotion,target);assert.equal(profilePromotion.promoted,true);const layoutPromotion=promoteProfileLayout(figurePromotion,grammarPromotion,visualPromotion,profilePromotion);assert.equal(layoutPromotion.promoted,true,JSON.stringify(layoutPromotion.report));const renderPromotion=promoteRenderedSvg(figurePromotion,visualPromotion,profilePromotion,layoutPromotion);assert.equal(renderPromotion.promoted,true,JSON.stringify(renderPromotion.report));const motionPromotion=withMotion?promoteProfileMotionProgram(figurePromotion,profilePromotion,layoutPromotion,motion):null;if(withMotion)assert.equal(motionPromotion.promoted,true,JSON.stringify(motionPromotion.report));return {authorities:{figurePromotion,grammarPromotion,visualPromotion,profilePromotion,layoutPromotion,renderPromotion,motionPromotion},canonical:{figure,visual,target,motion:withMotion?motion:null}};}
+
+test("promoted document is deterministic, immutable, and self-contained",()=>{const x=chain(true),a=promoteFigthreadDocument(x.authorities,x.canonical),b=promoteFigthreadDocument(x.authorities,x.canonical);assert.equal(a.promoted,true,JSON.stringify(a.report));assert.equal(a.promotion_receipt.promotion_hash,b.promotion_receipt.promotion_hash);assert.equal(a.figthread_document.html_hash,b.figthread_document.html_hash);assert.equal(a.figthread_document.manifest.build_hash,b.figthread_document.manifest.build_hash);assert.equal(Object.isFrozen(a.figthread_document.manifest),true);const html=a.figthread_document.html;assert.match(html,/^<!doctype html>/);assert.match(html,/id="figthread-manifest"/);assert.match(html,/window\.Figthread=Object\.freeze/);assert.match(html,/getStatus:/);assert.match(html,/prepareExport:/);assert.doesNotMatch(html,/<script\b[^>]*\bsrc=/i);assert.doesNotMatch(html,/<link\b[^>]*\bhref=/i);});
+
+test("document manifest separates canonical, compiled, and ephemeral runtime authority",()=>{const x=chain(true),r=composeFigthreadDocument(x.authorities,x.canonical);assert.equal(r.status,"pass");assert.equal(r.manifest.canonical.figure.id,figure.id);assert.equal(r.manifest.compiled.grammar_plan.plan_hash,x.authorities.grammarPromotion.grammar_plan.plan_hash);assert.equal(r.manifest.compiled.resolved_layout.layout_hash,x.authorities.layoutPromotion.resolved_layout.layout_hash);assert.equal(r.manifest.compiled.motion_program.program_hash,x.authorities.motionPromotion.motion_program.program_hash);assert.equal(r.manifest.runtime.has_motion,true);assert.equal(r.manifest.runtime.initial_mode,"interactive");assert.deepEqual(r.manifest.runtime.allowed_modes,["interactive","clean","static","error"]);});
+
+test("static document works without a MotionProgram",()=>{const x=chain(false),r=promoteFigthreadDocument(x.authorities,x.canonical);assert.equal(r.promoted,true,JSON.stringify(r.report));assert.equal(r.figthread_document.manifest.compiled.motion_program,null);assert.equal(r.figthread_document.manifest.runtime.has_motion,false);assert.equal(r.figthread_document.manifest.runtime.initial_mode,"static");assert.doesNotMatch(r.figthread_document.html,/id="figthread-play"/);});
+
+test("document fails closed on tampered compiled authority",()=>{const x=chain(true),bad={...x.authorities,renderPromotion:structuredClone(x.authorities.renderPromotion)};bad.renderPromotion.promotion_receipt.layout_hash="sha256:"+"0".repeat(64);const r=composeFigthreadDocument(bad,x.canonical);assert.equal(r.status,"fail");assert.ok(r.issues.some(i=>i.code==="DOC001_AUTHORITY"||i.code==="DOC004_COMPILE"));});
+
+test("canonical motion cannot appear without promoted motion authority",()=>{const x=chain(false),r=composeFigthreadDocument(x.authorities,{...x.canonical,motion});assert.equal(r.status,"fail");assert.ok(r.issues.some(i=>i.code==="DOC007_MOTION"));});
+
+test("browser bootstrap is fail-closed and exposes the stable inspection surface",()=>{const x=chain(true),r=composeFigthreadDocument(x.authorities,x.canonical);for(const code of ["DOC001_MANIFEST","DOC002_SCHEMA","DOC003_HASH","DOC004_COMPILE","DOC005_TARGET","DOC008_PURITY"])assert.match(r.html,new RegExp(code));for(const method of ["getStatus","listTargets","activateTarget","renderAt","setMode","prepareExport","getStateHash","getDiagnostics"])assert.match(r.html,new RegExp(method));assert.match(r.html,/figthread:state/);assert.match(r.html,/data-figthread-mode/);});
+
+test("document schema root mirror matches installed skill",async()=>{const [a,b]=await Promise.all([readFile(new URL("../skills/figthread/schemas/document-manifest.schema.json",import.meta.url),"utf8"),readFile(new URL("../schemas/document-manifest.schema.json",import.meta.url),"utf8")]);assert.equal(a,b);});
