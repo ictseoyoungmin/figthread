@@ -291,11 +291,11 @@ export async function reopenStage(runDir, stageId, reason) {
     }
     if (!manifest.active_receipts[stageId]) throw Object.assign(new Error(`stage ${stageId} has no active promoted receipt to reopen`), { code: "EXE009_REOPEN" });
 
-    const affected = EXECUTION_STAGES.slice(stage.ordinal - 1), invalidated = [];
+    const affected = EXECUTION_STAGES.slice(stage.ordinal - 1), invalidated = [], causalRevision = manifest.revisions[stageId] + 1;
     for (const target of affected) {
       const previousHash = manifest.active_receipts[target.id], previousRevision = manifest.revisions[target.id] ?? 0;
       if (previousHash) {
-        invalidated.push({ stage_id: target.id, receipt_hash: previousHash, receipt_path: manifest.receipt_paths[target.id], reopened_stage: stageId, reopen_revision: manifest.revisions[stageId] + 1, reason: reason.trim() });
+        invalidated.push({ stage_id: target.id, receipt_hash: previousHash, receipt_path: manifest.receipt_paths[target.id], reopened_stage: stageId, reopen_revision: causalRevision, reason: reason.trim() });
         manifest.active_receipts[target.id] = null; manifest.receipt_paths[target.id] = null;
       }
       if (previousRevision > 0) {
