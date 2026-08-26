@@ -1,8 +1,8 @@
 {
   "name": "figthread",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "private": true,
-  "description": "Semantic figure authoring with promoted grammar, visual, profile, layout, rendering, motion, self-contained HTML, content-addressed export, and resumable evidence-bound execution.",
+  "description": "Semantic figure authoring with promoted grammar, visual, profile, layout, rendering, browser-resolved text evidence, motion, self-contained HTML, content-addressed export, and resumable evidence-bound execution.",
   "type": "module",
   "scripts": {
     "test": "node --test",
@@ -19,6 +19,8 @@
     "layout:promote": "node skills/figthread/scripts/layout.mjs --promote",
     "render": "node skills/figthread/scripts/render.mjs",
     "render:promote": "node skills/figthread/scripts/render.mjs --promote",
+    "text:evidence": "node skills/figthread/scripts/browser-text.mjs",
+    "text:evidence:promote": "node skills/figthread/scripts/browser-text.mjs --promote",
     "motion": "node skills/figthread/scripts/motion.mjs",
     "motion:promote": "node skills/figthread/scripts/motion.mjs --promote",
     "document": "node skills/figthread/scripts/document.mjs",
