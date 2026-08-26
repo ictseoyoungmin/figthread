@@ -1,13 +1,14 @@
 schema: hadara.skill/v0.1
 name: figthread
-version: 1.1.0
+version: 1.2.0
 description: >-
   Design and validate semantic figures through promoted semantic state,
   canonical figure grammar, primitive-bound visual structure,
   profile-strengthened readability, deterministic layout geometry,
   deterministic SVG rendering, browser-resolved text evidence,
-  self-contained HTML runtime composition, deterministic semantic motion,
-  content-addressed export derivatives, and resumable evidence-bound execution workspaces.
+  self-contained HTML runtime composition, multi-target document packaging,
+  deterministic semantic motion, content-addressed export derivatives,
+  and resumable evidence-bound execution workspaces.
 entry:
   skill: SKILL.md
 resources:
@@ -26,9 +27,9 @@ compatibility:
   os: [windows, linux, macos]
 interface:
   display_name: "Figthread"
-  short_description: "Author deterministic figures with browser-certified text"
+  short_description: "Author deterministic multi-target semantic figures"
   icon_small: "./assets/icon.svg"
   icon_large: "./assets/icon.svg"
-  default_prompt: "Use $figthread to run the figure workflow in a resumable evidence-bound workspace: author and validate semantic state, promote grammar and visual authority, strengthen readability with the target profile, resolve deterministic layout, render the exact SVG, certify browser-resolved text bounds and platform fonts, compile semantic motion when useful, package the promoted authorities into one self-contained HTML document, and export only promoted derivatives."
+  default_prompt: "Use $figthread to run the figure workflow in a resumable evidence-bound workspace: author and validate semantic state, promote grammar and visual authority, strengthen readability per target profile, resolve deterministic layout independently for each target, render and certify browser-resolved text, compile semantic motion when useful, package exact promoted target documents into one self-contained multi-target HTML when needed, and export only promoted derivatives."
 policy:
   allow_implicit_invocation: true
