@@ -1,7 +1,7 @@
 {
   "name": "figthread",
-  "version": "1.4.0",
-  "description": "Design, validate, browser-review, multi-target package, browser-capture PNG/export, and resume semantic figure work from promoted evidence-bound authority.",
+  "version": "1.5.0",
+  "description": "Design, validate, run full-SVG browser visual audits, multi-target package, browser-capture PNG/export, and resume semantic figure work from promoted evidence-bound authority.",
   "author": {
     "name": "ictseoyoungmin",
     "url": "https://github.com/ictseoyoungmin"
@@ -9,6 +9,6 @@
   "homepage": "https://github.com/ictseoyoungmin/figthread",
   "repository": "https://github.com/ictseoyoungmin/figthread",
   "license": "MIT",
-  "keywords": ["figures", "visualization", "svg", "html", "png", "motion", "export", "workflow", "browser-evidence", "multi-target", "radial-layout", "documentation"],
+  "keywords": ["figures", "visualization", "svg", "html", "png", "motion", "export", "workflow", "browser-evidence", "visual-audit", "multi-target", "radial-layout", "documentation"],
   "skills": "./skills/"
 }
