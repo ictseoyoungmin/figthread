@@ -15,9 +15,9 @@ The implementation retains the ten promoted architecture slices closed through 1
 - **D-009** — content-addressed HTML/SVG export + browser-evidenced PNG capture contract
 - **D-010** — resumable run directory + immutable StageReceipt/checkpoint/reopen gate
 
-Version **1.0.1** added full fresh-worker benchmark dogfooding and repaired reopen revision reuse. Version **1.1.0** added actual Chrome-resolved glyph bounds and platform-font evidence. Version **1.2.0** added multi-target document packaging without turning CSS scaling or runtime resize into canonical geometry. Version **1.3.0** closes topology-specific deterministic radial layout for the registered radial grammar families.
+Version **1.0.1** added full fresh-worker benchmark dogfooding and repaired reopen revision reuse. Version **1.1.0** added actual Chrome-resolved glyph bounds and platform-font evidence. Version **1.2.0** added multi-target document packaging without turning CSS scaling or runtime resize into canonical geometry. Version **1.3.0** closed topology-specific deterministic radial layout for the registered radial grammar families. Version **1.4.0** installs the missing Chrome/Chromium PNG capture adapter and wires it into the export CLI.
 
-A bundled PNG capture adapter remains outside the current runtime. Generic force-directed graph layout and automatic multi-ring radial packing also remain intentionally unsupported.
+Generic force-directed graph layout and automatic multi-ring radial packing remain intentionally unsupported.
 
 ## Source of truth
 
@@ -102,6 +102,26 @@ npm run text:evidence:promote -- \
 
 The evidence is environment-specific. Figthread does not claim that every OS resolves the same platform font or screenshot bytes.
 
+## Installed PNG capture
+
+PNG export now uses a bundled zero-dependency Chrome/Chromium DevTools-pipe adapter. It does not reconstruct the figure through another raster renderer.
+
+The adapter loads the exact promoted self-contained HTML into an isolated `about:blank` page, waits for the fail-closed Figthread runtime and fonts, prepares either the semantic static-summary state or an exact event-sourced time frame, removes host-page padding/scaling only from the capture projection, applies the requested export-only background, and captures the exact promoted SVG surface.
+
+It returns actual browser identity, revision/protocol, OS/platform, device scale factor, and a content hash over the platform fonts Chrome reports for SVG text. `promoteExportArtifact` then revalidates PNG structure, CRCs, exact planned pixel dimensions, source authority, frame/state identity, and environment evidence before promotion. PNG binary identity is not claimed across browser/font/platform environments.
+
+```bash
+npm run export:promote -- \
+  skills/figthread/examples/minimal.figure.json \
+  skills/figthread/examples/minimal.visual.json \
+  skills/figthread/examples/minimal.layout-target.json \
+  skills/figthread/examples/minimal.motion.json \
+  skills/figthread/examples/minimal.png-export.json \
+  --out figure.png --capture-plan capture-plan.json
+```
+
+Set `FIGTHREAD_CHROME` or pass `--browser <executable>` if automatic browser discovery needs an explicit path. The low-level export API continues to accept an injected conforming `capturePng` function for tests or alternate environments.
+
 ## Full benchmark dogfood
 
 `benchmarks/e2e-dogfood/` drives the actual runtime through source understanding, claims, semantic promotion, grammar/visual, profile/layout/render, process handoff, motion, document, exact review, causal reopen, descendant regeneration, export, and completion verification.
@@ -141,14 +161,11 @@ npm run document:promote -- skills/figthread/examples/minimal.figure.json skills
 npm run text:evidence:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json skills/figthread/examples/minimal.motion.json --out browser-text-evidence.json
 npm run package:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.package.json skills/figthread/examples/minimal.motion.json --out figure.package.html
 npm run export:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json skills/figthread/examples/minimal.motion.json skills/figthread/examples/minimal.export.json --out figure.svg
+npm run export:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json skills/figthread/examples/minimal.motion.json skills/figthread/examples/minimal.png-export.json --out figure.png
 ```
 
 ## Determinism boundary
 
 Semantic, grammar, visual, profile, linear/radial layout, static SVG, motion, single-target document, multi-target package, HTML export, and vector-safe SVG export identities are content-addressed under their declared inputs. Browser text evidence additionally binds its browser/platform environment.
 
-A multi-target package is deterministic because it embeds exact promoted child HTML bytes and hashes. Browser target switching is projection state only.
-
-## Next bottleneck
-
-After topology-specific radial layout, the largest remaining delivery gap is a **bundled PNG capture adapter**. The export protocol already defines and validates PNG capture plans and evidence, but the installed runtime still requires an external conforming capture adapter. The next closure should launch the same controlled Chrome/Chromium environment used for browser evidence, prepare the promoted document at the exact semantic frame, capture exact target pixels, bind browser/font/environment evidence, validate PNG dimensions/chunks, and promote the resulting derivative without introducing a second layout or raster authority.
+PNG is captured from exact promoted HTML and content-addressed after capture. Its guarantee is same-input/same-browser-font-environment visual determinism, not cross-platform byte identity. A multi-target package is deterministic because it embeds exact promoted child HTML bytes and hashes. Browser target switching is projection state only.
