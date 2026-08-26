@@ -1,7 +1,7 @@
 {
   "name": "figthread",
-  "version": "0.1.0",
-  "description": "Design, validate, and package semantic figures with deterministic explanatory motion.",
+  "version": "0.9.0",
+  "description": "Design, validate, package, and export semantic figures from promoted deterministic authority.",
   "author": {
     "name": "ictseoyoungmin",
     "url": "https://github.com/ictseoyoungmin"
@@ -12,16 +12,16 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Figthread",
-    "shortDescription": "Design semantic figures with deterministic motion",
-    "longDescription": "A semantic figure authoring skill that turns claims into validated figure IR, readable visual composition, deterministic motion, and lean HTML/SVG artifacts.",
+    "shortDescription": "Author and export deterministic semantic figures",
+    "longDescription": "A semantic figure authoring skill that turns claims into validated semantic state, promoted grammar and visual authority, deterministic layout/rendering, semantic motion, self-contained HTML, and content-addressed delivery derivatives.",
     "developerName": "ictseoyoungmin",
     "category": "Developer Tools",
-    "capabilities": ["Instructions", "Visualization", "Validation", "Motion"],
+    "capabilities": ["Instructions", "Visualization", "Validation", "Motion", "Export"],
     "websiteURL": "https://github.com/ictseoyoungmin/figthread",
     "defaultPrompt": [
       "Use Figthread for this explanatory figure.",
       "Turn this claim into a publication-ready semantic figure.",
-      "Validate this figure's semantic structure and motion contract."
+      "Validate and export this figure from promoted authority."
     ],
     "brandColor": "#B5523A",
     "composerIcon": "./skills/figthread/assets/icon.svg",
