@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.1.0 — browser-resolved text evidence
+
+- added deterministic BrowserTextPlan identity bound to the exact promoted document, rendered SVG, layout, profile threshold, target viewport, semantic labels, and owner boxes
+- added a zero-dependency Chrome/Chromium DevTools-pipe adapter that measures the exact promoted SVG bytes in an isolated evidence-only `about:blank` harness
+- added browser `getBBox()` and client-rect measurement, computed typography/visibility capture, and `document.fonts` readiness/availability evidence
+- added actual platform-font family and glyph-count evidence through `CSS.getPlatformFontsForNode`
+- added environment-bound BrowserTextObservation and promoted BrowserTextEvidence hashes without granting browser layout geometry authority
+- added fail-closed `TXT001`–`TXT010` diagnostics for authority mismatch, font floors, glyph bounds, owner/viewport overflow, overlap, environment, coverage, source-copy drift, and evidence integrity
+- added a full-chain browser text CLI, installed/root evidence schema, runtime re-export, agent-facing reference, and boundary guard coverage
+- added real Chrome CLI regression coverage when Chrome is available and made browser text promotion a hard Node 20/22 CI gate
+- kept renderer evidence honest: serialized SVG evidence alone still does not claim browser glyph certification; the browser stage is a separate environment-bound proof
+- bumped package, installed skill, Claude plugin, and Codex plugin metadata to 1.1.0
+
 ## 1.0.1 — full execution dogfood hardening
 
 - added a repository benchmark that drives source understanding through claims, semantic promotion, grammar/visual, profile/layout/render, motion, document, exact artifact review, causal reopen, repaired descendants, and export

@@ -8,7 +8,7 @@
     {
       "name": "figthread",
       "source": "./skills/",
-      "description": "Semantic figure authoring with promoted deterministic rendering, motion, export, and resumable evidence-bound execution."
+      "description": "Semantic figure authoring with promoted deterministic rendering, browser-resolved text evidence, motion, export, and resumable evidence-bound execution."
     }
   ]
 }

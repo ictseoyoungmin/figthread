@@ -37,7 +37,7 @@ The renderer audits the SVG it actually emitted. The evidence record measures:
 
 The evidence record is content-hashed and bound into the rendered-SVG promotion receipt.
 
-Exact emitted SVG font sizes are certified. Browser-resolved glyph extents, font fallback identity, and final browser text bounding boxes are not yet certified; the evidence states this explicitly. Do not reinterpret that limitation as permission to shrink text or patch layout downstream.
+Exact emitted SVG font sizes are certified by this stage. The renderer deliberately leaves `browser_text_extent_certified` false because serialized markup cannot prove browser shaping or platform-font choice. Run the browser text review after document promotion to certify actual glyph bounds and platform-font identity for a recorded browser environment. Do not reinterpret the renderer's narrower authority as permission to shrink text or patch layout downstream.
 
 ## Visual encoding rule
 
@@ -58,4 +58,4 @@ Color is not used as the sole visual discriminator. Primary emphasis also change
 
 ## Recovery rule
 
-Repair the owning cause. Primitive failure reopens visual binding or the primitive implementation. Missing geometry reopens layout. Threshold failure reopens renderer tokens or the profile-safe visual implementation. Semantic state mismatch reopens semantic or visual state binding. Never hand-edit the promoted SVG to make an audit pass.
+Repair the owning cause. Primitive failure reopens visual binding or the primitive implementation. Missing geometry reopens layout. Threshold failure reopens renderer tokens or the profile-safe visual implementation. Semantic state mismatch reopens semantic or visual state binding. Browser text evidence failure reopens the earliest copy, typography, primitive measurement, profile, or layout cause. Never hand-edit the promoted SVG to make an audit pass.
