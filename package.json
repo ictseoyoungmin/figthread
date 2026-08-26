@@ -1,11 +1,12 @@
 {
   "name": "figthread",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Semantic figure authoring with promoted grammar, visual, profile, layout, rendering, motion, self-contained HTML, content-addressed export, and resumable evidence-bound execution.",
   "type": "module",
   "scripts": {
     "test": "node --test",
+    "benchmark:dogfood": "node benchmarks/e2e-dogfood/run.mjs all",
     "validate": "node skills/figthread/scripts/validate.mjs",
     "validate:promote": "node skills/figthread/scripts/validate.mjs --promote",
     "grammar": "node skills/figthread/scripts/grammar.mjs",
