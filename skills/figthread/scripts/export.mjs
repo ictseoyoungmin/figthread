@@ -10,11 +10,12 @@ import { promoteRenderedSvg } from "../runtime/renderer.js";
 import { promoteProfileMotionProgram } from "../runtime/profile-motion.js";
 import { promoteFigthreadDocument } from "../runtime/document.js";
 import { compileExport, exportPayloadToBuffer, promoteExportArtifact } from "../runtime/export.js";
+import { createChromePngCaptureAdapter } from "../runtime/png-capture.js";
 
-function usage(){console.error("usage: export.mjs <figure-spec.json> <visual-spec.json> <layout-target.json> [motion-spec.json] <export-spec.json> [--mode draft|gate] [--promote] [--out artifact] [--capture-plan plan.json]");}
-const args=process.argv.slice(2),promote=args.includes("--promote"),modeIndex=args.indexOf("--mode"),outIndex=args.indexOf("--out"),captureIndex=args.indexOf("--capture-plan"),mode=modeIndex>=0?args[modeIndex+1]:"gate";
-const valueIndexes=new Set([modeIndex+1,outIndex+1,captureIndex+1].filter(i=>i>0)),flags=new Set(["--promote","--mode","--out","--capture-plan"]),positional=args.filter((arg,index)=>!flags.has(arg)&&!valueIndexes.has(index));
-if(![4,5].includes(positional.length)||!["draft","gate"].includes(mode)||(outIndex>=0&&!args[outIndex+1])||(captureIndex>=0&&!args[captureIndex+1])){usage();process.exitCode=2;}else{
+function usage(){console.error("usage: export.mjs <figure-spec.json> <visual-spec.json> <layout-target.json> [motion-spec.json] <export-spec.json> [--mode draft|gate] [--promote] [--browser executable] [--out artifact] [--capture-plan plan.json]");}
+const args=process.argv.slice(2),promote=args.includes("--promote"),modeIndex=args.indexOf("--mode"),browserIndex=args.indexOf("--browser"),outIndex=args.indexOf("--out"),captureIndex=args.indexOf("--capture-plan"),mode=modeIndex>=0?args[modeIndex+1]:"gate";
+const valueIndexes=new Set([modeIndex+1,browserIndex+1,outIndex+1,captureIndex+1].filter(i=>i>0)),flags=new Set(["--promote","--mode","--browser","--out","--capture-plan"]),positional=args.filter((arg,index)=>!flags.has(arg)&&!valueIndexes.has(index));
+if(![4,5].includes(positional.length)||!["draft","gate"].includes(mode)||(browserIndex>=0&&!args[browserIndex+1])||(outIndex>=0&&!args[outIndex+1])||(captureIndex>=0&&!args[captureIndex+1])){usage();process.exitCode=2;}else{
   try{
     const docs=await Promise.all(positional.map(file=>readFile(resolve(file),"utf8").then(JSON.parse)));
     const figure=docs[0],visual=docs[1],target=docs[2],motion=docs.length===5?docs[3]:null,exportSpec=docs.length===5?docs[4]:docs[3];
@@ -44,7 +45,8 @@ if(![4,5].includes(positional.length)||!["draft","gate"].includes(mode)||(outInd
                   const documentPromotion=promoteFigthreadDocument(authorities,canonical);
                   if(!documentPromotion.promoted){console.log(JSON.stringify({stage:"document",promoted:false,report:documentPromotion.report},null,2));process.exitCode=1;}
                   else{
-                    const result=promote?await promoteExportArtifact(documentPromotion,renderPromotion,exportSpec):compileExport(documentPromotion,renderPromotion,exportSpec,{mode});
+                    const capturePng=exportSpec.format==="png"?createChromePngCaptureAdapter({browserExecutable:browserIndex>=0?args[browserIndex+1]:null}):undefined;
+                    const result=promote?await promoteExportArtifact(documentPromotion,renderPromotion,exportSpec,{capturePng}):compileExport(documentPromotion,renderPromotion,exportSpec,{mode});
                     const payload=result.payload;
                     if(payload&&outIndex>=0)await writeFile(resolve(args[outIndex+1]),exportPayloadToBuffer(payload));
                     const plan=result.export_plan??result.report?.export_plan;
