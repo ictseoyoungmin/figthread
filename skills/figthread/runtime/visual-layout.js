@@ -1,4 +1,5 @@
 import { sha256Canonical } from "./canonicalize.js";
+import { promoteGrammarPlan, readGrammarPromotion } from "./grammar.js";
 import { compilePromotedLayout, LAYOUT_ENGINE_VERSION } from "./layout.js";
 import { promoteProfilePlan, readProfilePromotion } from "./profile.js";
 
@@ -25,8 +26,17 @@ function internalRequest(profile) {
     options:structuredClone(profile.plan.options)
   };
 }
-function rebindLayout(result, visual, profile) {
+function rebindLayout(result, grammar, visual, profile) {
   const intentBase=structuredClone(result.layout_intent);
+  intentBase.grammar={
+    type:grammar.plan.grammar_id,
+    variant:grammar.plan.variant,
+    primary_axis:grammar.plan.primary_axis,
+    reading_order:grammar.plan.reading_order.slice()
+  };
+  intentBase.grammar_registry_hash=grammar.registryHash;
+  intentBase.grammar_definition_hash=grammar.definitionHash;
+  intentBase.grammar_plan_hash=grammar.grammarPlanHash;
   intentBase.visual_hash=visual.visualHash;
   intentBase.primitive_registry_hash=visual.registryHash;
   intentBase.primitive_plan_hash=visual.planHash;
@@ -36,6 +46,9 @@ function rebindLayout(result, visual, profile) {
   const intent=deepFreeze(intentBase),intentHash=sha256Canonical(intent);
   const {layout_hash:_old,...resolvedBase}=structuredClone(result.resolved_layout);
   resolvedBase.layout_intent_hash=intentHash;
+  resolvedBase.grammar_registry_hash=grammar.registryHash;
+  resolvedBase.grammar_definition_hash=grammar.definitionHash;
+  resolvedBase.grammar_plan_hash=grammar.grammarPlanHash;
   resolvedBase.visual_hash=visual.visualHash;
   resolvedBase.primitive_registry_hash=visual.registryHash;
   resolvedBase.primitive_plan_hash=visual.planHash;
@@ -45,22 +58,31 @@ function rebindLayout(result, visual, profile) {
   const resolved=deepFreeze({...resolvedBase,layout_hash:sha256Canonical(resolvedBase)});
   return { intent,intentHash,resolved };
 }
+function resolveGrammarArgs(figurePromotion, grammarOrVisual, visualOrProfile, profileOrOptions, maybeOptions) {
+  if (grammarOrVisual?.grammar_plan) return { grammarPromotion:grammarOrVisual, visualPromotion:visualOrProfile, profilePromotion:profileOrOptions, options:maybeOptions ?? {} };
+  return { grammarPromotion:promoteGrammarPlan(figurePromotion), visualPromotion:grammarOrVisual, profilePromotion:visualOrProfile, options:profileOrOptions ?? {} };
+}
 
-export function compileProfileLayout(figurePromotion, visualPromotion, profilePromotion, options = {}) {
-  const mode=options.mode??"gate";
+export function compileProfileLayout(figurePromotion, grammarOrVisual, visualOrProfile, profileOrOptions, maybeOptions = {}) {
+  const args=resolveGrammarArgs(figurePromotion,grammarOrVisual,visualOrProfile,profileOrOptions,maybeOptions);
+  const mode=args.options.mode??"gate";
   if(!["draft","gate"].includes(mode)) throw new TypeError("layout mode must be 'draft' or 'gate'");
-  const visual=readVisualPromotion(visualPromotion), profile=readProfilePromotion(profilePromotion);
-  if(!visual || !profile) {
-    return { mode,status:"fail",promotion_eligible:false,layout_engine_version:LAYOUT_ENGINE_VERSION,issues:[issue("LAY001_UNSAT","error","layout compilation requires valid promoted primitive and profile plans")] };
+  const grammar=readGrammarPromotion(args.grammarPromotion), visual=readVisualPromotion(args.visualPromotion), profile=readProfilePromotion(args.profilePromotion);
+  if(!grammar || !visual || !profile) {
+    const owner=!grammar?"grammar":!visual?"visual":"profile";
+    return { mode,status:"fail",promotion_eligible:false,layout_engine_version:LAYOUT_ENGINE_VERSION,issues:[issue("LAY001_UNSAT","error","layout compilation requires valid promoted grammar, primitive, and profile plans",{stage_owner:owner})] };
   }
-  if(visual.figureHash!==profile.figureHash || visual.visualHash!==profile.visualHash || visual.planHash!==profile.primitivePlanHash) {
-    return { mode,status:"fail",promotion_eligible:false,layout_engine_version:LAYOUT_ENGINE_VERSION,issues:[issue("LAY001_UNSAT","error","profile plan does not match the promoted visual authority",{stage_owner:"profile"})] };
+  if(grammar.figureHash!==visual.figureHash || visual.figureHash!==profile.figureHash || visual.visualHash!==profile.visualHash || visual.planHash!==profile.primitivePlanHash) {
+    return { mode,status:"fail",promotion_eligible:false,layout_engine_version:LAYOUT_ENGINE_VERSION,issues:[issue("LAY001_UNSAT","error","grammar, primitive, and profile plans do not share the same promoted semantic authority",{stage_owner:"grammar"})] };
   }
   const bridge=internalRequest(profile), legacy=compilePromotedLayout(figurePromotion,bridge,{mode});
   if(legacy.status==="fail") {
     return {
       ...legacy,
       request_hash:sha256Canonical({target:profile.plan.target,options:profile.plan.options}),
+      grammar_registry_hash:grammar.registryHash,
+      grammar_definition_hash:grammar.definitionHash,
+      grammar_plan_hash:grammar.grammarPlanHash,
       visual_hash:visual.visualHash,
       primitive_registry_hash:visual.registryHash,
       primitive_plan_hash:visual.planHash,
@@ -72,6 +94,7 @@ export function compileProfileLayout(figurePromotion, visualPromotion, profilePr
   if(legacy.figure_hash!==visual.figureHash || legacy.layout_intent.intrinsic_metrics_hash!==profile.plan.intrinsic_metrics_hash) {
     return {
       figure_hash:visual.figureHash,
+      grammar_plan_hash:grammar.grammarPlanHash,
       visual_hash:visual.visualHash,
       primitive_plan_hash:visual.planHash,
       profile_plan_hash:profile.profilePlanHash,
@@ -79,9 +102,20 @@ export function compileProfileLayout(figurePromotion, visualPromotion, profilePr
       issues:[issue("LAY001_UNSAT","error","layout engine metrics do not match the promoted profile plan",{stage_owner:"profile"})]
     };
   }
-  const rebound=rebindLayout(legacy,visual,profile), issues=sortIssues(structuredClone(legacy.issues));
+  if(legacy.layout_intent.grammar.primary_axis!==grammar.plan.primary_axis) {
+    return {
+      figure_hash:visual.figureHash,
+      grammar_plan_hash:grammar.grammarPlanHash,
+      mode,status:"fail",promotion_eligible:false,layout_engine_version:LAYOUT_ENGINE_VERSION,
+      issues:[issue("LAY001_UNSAT","error","base layout axis does not match promoted grammar authority",{stage_owner:"grammar"})]
+    };
+  }
+  const rebound=rebindLayout(legacy,grammar,visual,profile), issues=sortIssues(structuredClone(legacy.issues));
   return {
     figure_hash:visual.figureHash,
+    grammar_registry_hash:grammar.registryHash,
+    grammar_definition_hash:grammar.definitionHash,
+    grammar_plan_hash:grammar.grammarPlanHash,
     visual_hash:visual.visualHash,
     primitive_registry_hash:visual.registryHash,
     primitive_plan_hash:visual.planHash,
@@ -101,13 +135,19 @@ export function compileProfileLayout(figurePromotion, visualPromotion, profilePr
   };
 }
 
-export function promoteProfileLayout(figurePromotion, visualPromotion, profilePromotion) {
-  const result=compileProfileLayout(figurePromotion,visualPromotion,profilePromotion,{mode:"gate"});
+export function promoteProfileLayout(figurePromotion, grammarOrVisual, visualOrProfile, profileMaybe) {
+  const explicit=grammarOrVisual?.grammar_plan;
+  const result=explicit
+    ? compileProfileLayout(figurePromotion,grammarOrVisual,visualOrProfile,profileMaybe,{mode:"gate"})
+    : compileProfileLayout(figurePromotion,grammarOrVisual,visualOrProfile,{mode:"gate"});
   if(!result.promotion_eligible) return {promoted:false,report:result};
   const receiptBase={
     kind:"resolved_layout",
     schema_version:result.resolved_layout.schema_version,
     figure_hash:result.figure_hash,
+    grammar_registry_hash:result.grammar_registry_hash,
+    grammar_definition_hash:result.grammar_definition_hash,
+    grammar_plan_hash:result.grammar_plan_hash,
     visual_hash:result.visual_hash,
     primitive_registry_hash:result.primitive_registry_hash,
     primitive_plan_hash:result.primitive_plan_hash,
@@ -128,17 +168,21 @@ export function promoteProfileLayout(figurePromotion, visualPromotion, profilePr
   };
 }
 
-// Compatibility entry points keep the target-only API usable, but profile promotion is
-// still mandatory internally and therefore cannot be bypassed.
+// Compatibility entry points keep the target-only API usable, but grammar and profile
+// promotion remain mandatory internally and therefore cannot be bypassed.
 export function compileVisualLayout(figurePromotion, visualPromotion, target, options = {}) {
   if(!readVisualPromotion(visualPromotion)) return {mode:options.mode??"gate",status:"fail",promotion_eligible:false,layout_engine_version:LAYOUT_ENGINE_VERSION,issues:[issue("LAY001_UNSAT","error","layout compilation requires a valid promoted primitive plan",{stage_owner:"visual"})]};
+  const grammarPromotion=promoteGrammarPlan(figurePromotion);
+  if(!grammarPromotion.promoted) return {mode:options.mode??"gate",status:"fail",promotion_eligible:false,layout_engine_version:LAYOUT_ENGINE_VERSION,issues:grammarPromotion.report.issues.map((entry)=>({...entry,stage_owner:"grammar"}))};
   const profilePromotion=promoteProfilePlan(figurePromotion,visualPromotion,target);
   if(!profilePromotion.promoted) return profilePromotion.report;
-  return compileProfileLayout(figurePromotion,visualPromotion,profilePromotion,options);
+  return compileProfileLayout(figurePromotion,grammarPromotion,visualPromotion,profilePromotion,options);
 }
 export function promoteVisualLayout(figurePromotion, visualPromotion, target) {
   if(!readVisualPromotion(visualPromotion)) return {promoted:false,report:{mode:"gate",status:"fail",promotion_eligible:false,layout_engine_version:LAYOUT_ENGINE_VERSION,issues:[issue("LAY001_UNSAT","error","layout compilation requires a valid promoted primitive plan",{stage_owner:"visual"})]}};
+  const grammarPromotion=promoteGrammarPlan(figurePromotion);
+  if(!grammarPromotion.promoted) return {promoted:false,report:grammarPromotion.report};
   const profilePromotion=promoteProfilePlan(figurePromotion,visualPromotion,target);
   if(!profilePromotion.promoted) return {promoted:false,report:profilePromotion.report};
-  return promoteProfileLayout(figurePromotion,visualPromotion,profilePromotion);
+  return promoteProfileLayout(figurePromotion,grammarPromotion,visualPromotion,profilePromotion);
 }
