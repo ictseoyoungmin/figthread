@@ -1,6 +1,6 @@
 # Figthread
 
-Figthread is a semantic figure authoring system. The implementation now covers nine promoted slices:
+Figthread is a semantic figure authoring system. The implementation now covers ten promoted development slices:
 
 - **D-001** — FigureSpec structural + semantic gate
 - **D-002** — LayoutIntent + deterministic ResolvedLayout gate
@@ -11,72 +11,135 @@ Figthread is a semantic figure authoring system. The implementation now covers n
 - **D-007** — canonical figure grammar registry + GrammarPlan gate
 - **D-008** — self-contained FigthreadDocument + fail-closed browser runtime gate
 - **D-009** — content-addressed HTML/SVG export + browser-evidenced PNG capture gate
+- **D-010** — resumable run directory + immutable StageReceipt/checkpoint/reopen gate
 
-Browser-resolved glyph extent proof, topology-specific radial solving, multi-target packaging, and run-directory execution packaging remain downstream slices.
+Browser-resolved glyph extent proof, topology-specific radial solving, multi-target packaging, and a bundled browser PNG capture adapter remain outside the current runtime.
 
 ## Source of truth
 
-The installable skill is self-contained under `skills/figthread/` and is the implementation source of truth:
+The installable skill under `skills/figthread/` is the runtime source of truth. Important execution additions are:
 
-- `skills/figthread/schemas/figure-spec.schema.json` — semantic figure contract
-- `skills/figthread/grammars/registry.json` — content-hashed twelve-grammar registry
-- `skills/figthread/schemas/grammar-plan.schema.json` — promoted grammar-plan contract
-- `skills/figthread/schemas/visual-spec.schema.json` — visual binding contract
-- `skills/figthread/schemas/primitive-definition.schema.json` — custom primitive contract
-- `skills/figthread/primitives/registry.json` — 24-family core primitive registry
-- `skills/figthread/profiles/registry.json` — five-profile threshold registry
-- `skills/figthread/schemas/profile-plan.schema.json` — promoted profile-plan contract
-- `skills/figthread/schemas/layout-target.schema.json` — public layout target contract
-- `skills/figthread/schemas/layout-request.schema.json` — internal measurement bridge used by the base solver
-- `skills/figthread/schemas/motion-spec.schema.json` — semantic motion contract
-- `skills/figthread/schemas/document-manifest.schema.json` — self-contained document manifest contract
-- `skills/figthread/schemas/export-spec.schema.json` — derivative export request contract
-- `skills/figthread/runtime/validator.js` — D-001 promotion
-- `skills/figthread/runtime/grammar.js` — D-007 grammar validation, topology checks, and GrammarPlan promotion
-- `skills/figthread/runtime/visual.js` — D-004 primitive binding/promotion
-- `skills/figthread/runtime/profile.js` — D-005 profile threshold selection/promotion
-- `skills/figthread/runtime/layout.js` — D-002 base deterministic solver/router
-- `skills/figthread/runtime/visual-layout.js` — grammar/profile-aware layout adapter
-- `skills/figthread/runtime/renderer.js` — D-006 deterministic static SVG renderer and rendered-profile audit
-- `skills/figthread/runtime/profile-motion.js` — profile-envelope motion adapter
-- `skills/figthread/runtime/motion.js` — D-003 semantic motion validator/compiler/evaluator/promotion
-- `skills/figthread/runtime/document.js` — D-008 manifest/hash-chain compiler and embedded browser runtime
-- `skills/figthread/runtime/export.js` — D-009 export planning, text/vector derivatives, PNG capture evidence, and artifact promotion
-- `skills/figthread/scripts/*.mjs` — skill-local CLIs
-- `skills/figthread/references/` — agent-facing normative behavior without internal roadmap labels or contract-version labels
+- `skills/figthread/runtime/execution.js` — run initialization, verification, promotion receipts, checkpoints, reopen, resume, and writer-lock recovery
+- `skills/figthread/scripts/workspace.mjs` — skill-local workspace CLI
+- `skills/figthread/references/execution-workspace.md` — agent-facing execution protocol
+- `skills/figthread/schemas/run-manifest.schema.json` — mutable run-state contract
+- `skills/figthread/schemas/stage-receipt.schema.json` — immutable stage-promotion record
+- `skills/figthread/schemas/checkpoint.schema.json` — resumable active-state snapshot
 
-Root `src/`, `schemas/`, `grammars/`, `profiles/`, `examples/`, and `test/` are repository development mirrors/harnesses and do not maintain a second runtime implementation.
+The existing semantic, grammar, primitive, profile, layout, render, motion, document, and export runtimes remain under the same installed skill tree. Root `src/`, `schemas/`, `grammars/`, `profiles/`, `examples/`, and `test/` are development mirrors/harnesses, not a second implementation.
 
-## Promotion pipeline
+## Promotion and execution model
 
 ```text
-FigureSpec
-  -> D-001 gate -> validated_figure
-  -> grammar registry -> D-007 gate -> GrammarPlan
-  -> VisualSpec + primitive registry -> D-004 gate -> PrimitivePlan
-  -> target + profile registry -> D-005 gate -> ProfilePlan
-  -> D-002 gate -> ResolvedLayout
-  -> D-006 gate -> rendered_svg + rendered-profile evidence
-  -> optional MotionSpec + profile envelope -> D-003 gate -> MotionProgram
-  -> D-008 gate -> self-contained FigthreadDocument HTML
-  -> ExportSpec -> D-009 gate -> ExportArtifact
+source bytes
+  -> run workspace
+  -> understanding receipt
+  -> claims receipt
+  -> FigureSpec / semantic promotion
+  -> grammar + visual promotion
+  -> profile + layout promotion
+  -> render + optional motion promotion
+  -> self-contained document promotion
+  -> exact artifact review
+  -> export promotion
+  -> completed run
 ```
 
-The export stage is derivative-only. It binds ExportSpec to the promoted document/render hashes and may package exact HTML, derive a vector-safe static-summary SVG, or accept a browser-captured PNG with deterministic state and environment evidence. It cannot change semantic or geometry authority.
+The execution layer does not replace the figure promotion chain. It records which exact artifacts and evidence proved each stage and which revisions remain active.
 
-## Commands
+```text
+run manifest
+  -> active frontier + revisions
+
+StageReceipt
+  -> source hash
+  -> predecessor receipt hash
+  -> artifact byte hashes
+  -> evidence byte hashes
+  -> optional authority hashes
+
+checkpoint
+  -> active receipt set
+  -> revision counters
+  -> frontier
+  -> previous checkpoint hash
+```
+
+A file path, screenshot, or conversation claim is not completion proof. Completion requires a valid active receipt for every stage.
+
+## Run directory
+
+```text
+run-<date>-<source8>/
+├── run.json
+├── intake/
+├── stages/
+│   ├── 01-understanding/
+│   ├── 02-claims/
+│   ├── 03-figure-ir/
+│   ├── 04-grammar-visual/
+│   ├── 05-layout/
+│   ├── 06-motion/
+│   ├── 07-document/
+│   ├── 08-review/
+│   └── 09-export/
+├── receipts/
+├── checkpoints/
+├── evidence/
+├── logs/
+├── final/
+└── tmp/
+```
+
+Each active stage receives a revision directory such as `stages/03-figure-ir/r0001/`. Reopen creates `r0002`, `r0003`, and so on rather than changing prior promoted history.
+
+## Workspace commands
+
+```bash
+npm run workspace -- stages
+npm run workspace -- init ./runs ./source.pdf
+npm run workspace -- resume ./runs/run-...
+npm run workspace -- verify ./runs/run-...
+npm run workspace -- promote ./runs/run-... understanding --artifact <path> --evidence <path>
+npm run workspace -- reopen ./runs/run-... figure-ir --reason "review exposed upstream cause"
+npm run workspace -- checkpoint ./runs/run-... --reason "handoff"
+npm run workspace -- recover-lock ./runs/run-... --reason "confirmed crashed worker"
+```
+
+The skill-facing instructions use `node <skill-root>/scripts/workspace.mjs ...`; repository npm commands above are only developer conveniences.
+
+## D-010 guarantees
+
+- run source is copied into `intake/` and bound by exact byte hash and byte length
+- run manifest is content-hashed and updated atomically
+- nine fixed execution stages define one active frontier
+- every promoted stage requires at least one exact artifact and one exact evidence file
+- artifact/evidence paths cannot escape the run directory
+- normal stage artifacts must live under the active revision directory; final export artifacts may also be bound under `final/`
+- StageReceipt records are immutable and content-addressed
+- receipt chains bind each stage to source provenance and the immediate promoted predecessor
+- optional promoted authority hashes can be embedded in receipts
+- every promotion creates a content-hashed checkpoint
+- checkpoints form a previous-hash chain and snapshot active receipts, revisions, and frontier
+- verification re-hashes source, receipts, artifacts, evidence, and the latest checkpoint
+- resume finds the earliest invalid stage and returns a fresh-worker packet without conversation history
+- reopen increments the causal stage revision and automatically invalidates all active descendants
+- invalidated receipts/files remain preserved for audit
+- changed promoted artifact/evidence bytes can be recovered by reopening the earliest invalid stage
+- changed intake provenance or an invalid run manifest cannot be hidden by reopen
+- mutating commands use one exclusive writer lock
+- stale-lock recovery is explicit and leaves a content-hashed audit record
+- full completion requires valid active receipts through export
+- installed skill prose remains free of internal roadmap codes and public contract-version labels
+
+## Figure pipeline commands
 
 ```bash
 npm test
-npm run validate -- skills/figthread/examples/minimal.figure.json
 npm run validate:promote -- skills/figthread/examples/minimal.figure.json
-npm run grammar -- skills/figthread/examples/minimal.figure.json
 npm run grammar:promote -- skills/figthread/examples/minimal.figure.json
-npm run visual -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json
 npm run visual:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json
-npm run profile -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json
 npm run profile:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json
-npm run layout -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json
 npm run layout:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json
 npm run render:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json --out figure.svg --evidence evidence.json
 npm run motion:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json skills/figthread/examples/minimal.motion.json
@@ -84,22 +147,4 @@ npm run document:promote -- skills/figthread/examples/minimal.figure.json skills
 npm run export:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json skills/figthread/examples/minimal.motion.json skills/figthread/examples/minimal.export.json --out figure.svg
 ```
 
-Omit the motion input from `document`/`document:promote` and `export`/`export:promote` when the figure has no motion. PNG promotion is adapter-driven: without a browser capture adapter, the runtime returns the deterministic capture plan and fails promotion rather than inventing a second raster renderer.
-
-## D-009 guarantees
-
-- ExportSpec is structurally and semantically validated against the exact promoted document target/profile
-- ExportPlan binds request hash, canonical hash, compile key, document build/HTML hash, rendered SVG/render hash, motion-program hash, target, frame, scale, background, and live-text policy
-- HTML export is the exact promoted self-contained document bytes
-- default SVG export is byte-identical to the promoted rendered SVG
-- SVG scale/background changes affect only derivative presentation; viewBox and promoted layout authority remain unchanged
-- vector export fails on scripts, foreign objects, raster images, external references, or other non-vector-safe constructs
-- PNG is never generated by a second Figthread raster renderer
-- PNG capture plan fixes selector, semantic frame, expected state hash, expected local time, pixel dimensions, background, and scale
-- PNG promotion verifies signature/chunk structure, chunk CRCs, exact dimensions, preparation evidence, source hashes, semantic state hash, and browser/font/environment fingerprint
-- HTML/SVG determinism scope is exact bytes for identical promoted input/request
-- PNG records a content hash and same-input/same-environment visual determinism scope without claiming cross-platform binary identity
-- immutable ExportPlan, ExportArtifact, and export promotion receipt
-- agent-facing prose remains free of internal roadmap codes and public contract-version labels
-
-The next bottleneck is workspace/execution closure: make promotion receipts, reopen boundaries, resume checkpoints, and exact artifact evidence durable in a run directory so a fresh worker can resume without conversation history.
+The next development bottleneck after execution closure is benchmark dogfooding: drive the full run protocol from source understanding through export with fresh-worker resume/reopen and use real evidence to expose remaining cross-stage defects.
