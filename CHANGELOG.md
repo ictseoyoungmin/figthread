@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.8.0 — D-008 self-contained document runtime
+
+- added a deterministic self-contained HTML document compiler over promoted semantic, grammar, visual, profile, layout, render, and optional motion authority
+- separated canonical input hash, compiled-authority compile key, manifest build hash, and exact HTML hash
+- added a document manifest schema and immutable document promotion receipt
+- added a fail-closed embedded browser bootstrap that verifies schema, hashes, compile key, target identity, SVG viewport, and external-dependency purity before reporting ready
+- added interactive, clean, static, and error runtime modes without allowing DOM/CSS state to become canonical authority
+- added event-sourced runtime seeking and cue projection for reveal, focus, trace, transfer, and morph-state tracks
+- added the stable `window.Figthread` inspection API for status, target inspection, seeking, mode switching, export preparation, state hashing, and diagnostics
+- added a skill-local document CLI for animated or static single-file HTML output
+- added document schema/runtime root mirrors, agent-facing runtime guidance, CI coverage, and regression tests
+- kept public skill prose free of roadmap codes and contract-version labels
+
 ## 0.7.0 — D-007 canonical figure grammar
 
 - added a content-hashed twelve-grammar registry covering comparison, architecture, pipeline, mechanism, state-transition, timeline, network, hierarchy, swimlane, lifecycle, dataflow, and multi-panel
