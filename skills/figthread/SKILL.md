@@ -10,7 +10,7 @@ description: >-
 
 Figure first, motion second.
 
-Semantic figure state must be validated and promoted before grammar, visual, profile, layout, render, motion, or document work may depend on it. One canonical figure grammar must then be validated and promoted before layout treats reading order, topology, or composition rules as authoritative. Visual binding must be validated and promoted before a profile may strengthen readability and density constraints. A promoted profile plan must exist before layout treats measurements or target spacing as authoritative. Deterministic layout must be validated and promoted before rendering or motion treats geometry as authoritative. Static rendering must consume the promoted semantic summary snapshot and audit the SVG it actually emitted. Semantic motion must satisfy both the selected profile envelope and semantic motion validation before a runtime treats animation tracks as authoritative. The final document may compose those promoted authorities into one self-contained HTML runtime, but DOM or CSS state may never replace them. Do not bypass an upstream promotion gate.
+Semantic figure state must be validated and promoted before grammar, visual, profile, layout, render, motion, document, or export work may depend on it. One canonical figure grammar must then be validated and promoted before layout treats reading order, topology, or composition rules as authoritative. Visual binding must be validated and promoted before a profile may strengthen readability and density constraints. A promoted profile plan must exist before layout treats measurements or target spacing as authoritative. Deterministic layout must be validated and promoted before rendering or motion treats geometry as authoritative. Static rendering must consume the promoted semantic summary snapshot and audit the SVG it actually emitted. Semantic motion must satisfy both the selected profile envelope and semantic motion validation before a runtime treats animation tracks as authoritative. The final document may compose those promoted authorities into one self-contained HTML runtime, but DOM or CSS state may never replace them. Export may package or capture only promoted derivatives and may never repair upstream meaning or geometry. Do not bypass an upstream promotion gate.
 
 ## Required reading
 
@@ -57,6 +57,12 @@ Before packaging the final HTML document, also read:
 
 1. `references/document-runtime.md`
 2. `schemas/document-manifest.schema.json`
+
+Before producing delivery derivatives, also read:
+
+1. `references/export.md`
+2. `schemas/export-spec.schema.json`
+3. `templates/export-spec.json`
 
 ## Semantic authoring and promotion
 
@@ -141,6 +147,17 @@ Use motion only when it explains sequence, transfer, propagation, state change, 
 7. The embedded bootstrap verifies its build hash, canonical hash, compile key, target viewport, and external-dependency boundary before reporting ready.
 8. Runtime seeking is event-sourced. Temporary cue overlays and DOM styles are ephemeral projections and must never be promoted upstream.
 
+## Export derivatives and promotion
+
+1. Start from a promoted `figthread_document` and its matching promoted rendered SVG.
+2. Author `ExportSpec` with the exact document ID, target, profile, format, frame, background, scale, and live-text policy.
+3. Run `node <skill-root>/scripts/export.mjs <figure-spec.json> <visual-spec.json> <layout-target.json> [motion-spec.json] <export-spec.json> --mode gate`.
+4. Repair `EXP` failures at the request, source authority, target, frame, vector eligibility, text policy, capture, or purity owner. Never hand-edit derivative bytes and then claim promotion.
+5. Promote HTML or SVG with the same command and `--promote --out <artifact>`. HTML is the exact promoted document. Default standalone SVG is byte-identical to the promoted rendered SVG.
+6. PNG promotion requires a conforming browser capture adapter. Without one, preserve the emitted capture plan and fail promotion instead of substituting a second raster renderer.
+7. A browser adapter must load the exact promoted HTML, prepare the requested semantic frame through the stable Figthread runtime API, capture the planned SVG selector at the planned scale, and return preparation evidence plus a browser/font/environment fingerprint.
+8. Treat only a promoted `ExportArtifact` as a certified delivery derivative.
+
 ## Authority model
 
 - `FigureSpec` owns meaning and semantic state domains.
@@ -157,10 +174,13 @@ Use motion only when it explains sequence, transfer, propagation, state change, 
 - `MotionSpec` owns semantic timing, state effects, and cues, but no resolved geometry.
 - `MotionProgram` owns deterministic compiled tracks whose geometry is resolved from `ResolvedLayout`.
 - The document manifest binds canonical input hashes to compiled authority hashes and the exact single-target runtime build.
-- The browser document runtime owns only ephemeral playback, mode, controls, cue overlays, and inspection state.
+- The browser document runtime owns only ephemeral playback, mode, controls, cue overlays, inspection state, and export-time projection.
+- `ExportSpec` selects a derivative from promoted sources. It does not own figure meaning or geometry.
+- `ExportPlan` binds the export request to document/render hashes and, for PNG, deterministic browser capture instructions.
+- `ExportArtifact` owns derivative byte identity, content hash, byte length, and determinism evidence.
 - Semantic relations remain in `FigureSpec`; the router chooses anchors and paths only after boxes freeze.
 - Browser or CSS auto-layout is never canonical geometry.
-- View/runtime state must not silently mutate promoted semantic, grammar, visual, profile, layout, render, motion, or document state.
+- View/runtime/export projection state must not silently mutate promoted semantic, grammar, visual, profile, layout, render, motion, or document state.
 
 ## Non-negotiables
 
@@ -189,10 +209,16 @@ Use motion only when it explains sequence, transfer, propagation, state change, 
 - Browser bootstrap must fail closed on manifest, schema, hash, compile-key, target, or purity mismatch.
 - DOM/CSS/runtime state is ephemeral and may not become semantic or geometry authority.
 - `static` document mode uses the declared semantic summary state rather than an arbitrary motion frame.
+- HTML export must preserve the exact promoted self-contained document bytes.
+- Standalone SVG export must originate from the promoted static SVG and must fail when the vector-safe subset is violated.
+- PNG must be captured from the promoted HTML runtime; do not silently replace browser capture with a second renderer.
+- PNG capture evidence must bind target, document build, SVG source, requested frame, deterministic state hash, exact pixel dimensions, and environment fingerprint.
+- Cross-platform binary identity is not promised for browser PNG screenshots; record the environment fingerprint and content hash instead.
 - Same promoted figure + grammar plan + primitive plan + profile plan + engine version must produce the same layout hash.
 - Same promoted semantic/grammar/visual/profile/layout authorities + render engine version must produce the same SVG/render hashes.
 - Same promoted figure + promoted layout + canonical motion input + motion engine version must produce the same motion program hash.
 - Same canonical inputs + promoted compiled authorities + document engine version must produce the same document build and HTML hashes.
+- Same promoted document/render authorities + canonical export request + export engine version must produce the same HTML/SVG export plan and exact derivative bytes.
 - Force-directed and stochastic layout are not allowed fallbacks.
 - Motion evaluation uses integer milliseconds and deterministic event ordering.
 - `add` is allowed only for numeric/count/ratio state domains; every resulting value must remain inside the declared domain.
@@ -205,6 +231,6 @@ Use motion only when it explains sequence, transfer, propagation, state change, 
 
 ## Current runtime capabilities
 
-The installed runtime supports semantic validation, a content-hashed twelve-grammar registry with role/topology/order/split validation, a hash-verified core primitive registry, custom primitive validation, a hash-verified five-profile threshold registry, deterministic profile-owned label/spacing refinement, semantic density gating, presentation safe-margin gating, profile motion-envelope validation, left-right/top-down layout with orthogonal routing, deterministic static SVG rendering for all bundled core primitive families, rendered SVG audits for explicit typography/stroke/contrast/grayscale/purity evidence, deterministic semantic motion compilation/evaluation for state effects and `reveal`, `focus`, `transfer`, `trace`, and `morph-state` cues, and deterministic self-contained single-target HTML composition with fail-closed bootstrap and inspection API.
+The installed runtime supports semantic validation, a content-hashed twelve-grammar registry with role/topology/order/split validation, a hash-verified core primitive registry, custom primitive validation, a hash-verified five-profile threshold registry, deterministic profile-owned label/spacing refinement, semantic density gating, presentation safe-margin gating, profile motion-envelope validation, left-right/top-down layout with orthogonal routing, deterministic static SVG rendering for all bundled core primitive families, rendered SVG audits for explicit typography/stroke/contrast/grayscale/purity evidence, deterministic semantic motion compilation/evaluation for state effects and `reveal`, `focus`, `transfer`, `trace`, and `morph-state` cues, deterministic self-contained single-target HTML composition with fail-closed bootstrap and inspection API, exact HTML export, vector-safe static-summary SVG export, and browser-adapter PNG promotion with state/dimension/environment evidence.
 
-Browser-resolved glyph extents and font fallback identity, topology-specific radial solving, multi-target document packaging, and PNG/final export packaging are not yet available. When one of those checks is required, fail closed or preserve it as explicit audit evidence rather than pretending the current runtime has proved it.
+Browser-resolved glyph extents and font fallback identity, topology-specific radial solving, and multi-target document packaging are not yet available. The skill-local export CLI does not invent a browser when none is available: PNG promotion requires a conforming capture adapter and otherwise fails closed with a capture plan.
