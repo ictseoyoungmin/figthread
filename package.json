@@ -1,8 +1,8 @@
 {
   "name": "figthread",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "private": true,
-  "description": "Semantic figure authoring with promoted grammar, visual, profile, deterministic linear and topology-specific radial layout, rendering, browser-resolved text evidence, motion, self-contained HTML, multi-target packaging, content-addressed export, and resumable evidence-bound execution.",
+  "description": "Semantic figure authoring with promoted grammar, visual, profile, deterministic linear and topology-specific radial layout, rendering, browser-resolved text evidence, motion, self-contained HTML, multi-target packaging, browser-captured PNG/content-addressed export, and resumable evidence-bound execution.",
   "type": "module",
   "scripts": {
     "test": "node --test",
