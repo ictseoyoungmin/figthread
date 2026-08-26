@@ -8,17 +8,13 @@ description: >-
 
 # Figthread
 
-Figure first, motion second. Meaning, grammar, visual binding, readability constraints, geometry, static rendering, browser text evidence, motion, document packaging, export, and execution evidence have separate authorities. Never let a downstream stage silently repair or replace an upstream authority.
+Figure first, motion second. Meaning, grammar, visual binding, readability constraints, geometry, static rendering, browser text evidence, motion, single-target documents, multi-target packaging, export, and execution evidence have separate authorities. Never let a downstream stage silently repair or replace an upstream authority.
 
 For work that spans multiple stages, may be interrupted, or must survive worker handoff, use the execution workspace as external memory. Conversation history, screenshots, and path existence are not completion proof.
 
 ## Required reading
 
-For resumable or multi-stage work, read first:
-
-1. `references/execution-workspace.md`
-2. `schemas/run-manifest.schema.json`
-3. `schemas/stage-receipt.schema.json`
+For resumable or multi-stage work, read `references/execution-workspace.md`, `schemas/run-manifest.schema.json`, and `schemas/stage-receipt.schema.json` first.
 
 Before semantic authoring, read `references/figure-ir.md`, `schemas/figure-spec.schema.json`, and `templates/figure-spec.json`.
 
@@ -28,37 +24,27 @@ Before visual binding, also read `references/visual-primitives.md`, `schemas/vis
 
 Before profile/target resolution, also read `references/profile-thresholds.md`, `profiles/registry.json`, `schemas/layout-target.schema.json`, and `templates/layout-target.json`.
 
-Before deterministic layout, read `references/layout-resolution.md`.
-
-Before static rendering, read `references/rendering.md`.
+Before deterministic layout, read `references/layout-resolution.md`. Before static rendering, read `references/rendering.md`.
 
 When motion adds explanatory value, read `references/motion-ir.md`, `schemas/motion-spec.schema.json`, and `templates/motion-spec.json`.
 
-Before final HTML packaging, read `references/document-runtime.md` and `schemas/document-manifest.schema.json`.
+Before single-target HTML packaging, read `references/document-runtime.md` and `schemas/document-manifest.schema.json`.
 
 Before browser-resolved typography review, read `references/browser-text-evidence.md` and `schemas/browser-text-evidence.schema.json`.
+
+Before combining independently promoted targets, read `references/document-package.md` and `schemas/document-package.schema.json`.
 
 Before delivery derivatives, read `references/export.md`, `schemas/export-spec.schema.json`, and `templates/export-spec.json`.
 
 ## Resumable execution workflow
 
-Initialize a run from the exact source bytes:
-
-```bash
-node <skill-root>/scripts/workspace.mjs init <runs-root> <source-file>
-```
-
-At the beginning of every fresh-worker session or handoff, resume from disk:
-
-```bash
-node <skill-root>/scripts/workspace.mjs resume <run-dir>
-```
+Initialize a run from exact source bytes with `node <skill-root>/scripts/workspace.mjs init <runs-root> <source-file>`. At every fresh-worker session or handoff, resume with `node <skill-root>/scripts/workspace.mjs resume <run-dir>`.
 
 The canonical stage frontier is:
 
 `understanding → claims → figure-ir → grammar-visual → layout → motion → document → review → export`
 
-For the reported frontier, work only in its active revision directory, inspect the exact current artifact when visual evidence is relevant, save evidence inside the run directory, and promote only after artifact and evidence are ready:
+For the active frontier, work only in its active revision directory, inspect the exact artifact when visual evidence matters, save evidence inside the run, and promote only when artifact and evidence are ready:
 
 ```bash
 node <skill-root>/scripts/workspace.mjs promote <run-dir> <stage> \
@@ -66,7 +52,7 @@ node <skill-root>/scripts/workspace.mjs promote <run-dir> <stage> \
   --evidence <evidence-path>
 ```
 
-Repeat `--artifact` and `--evidence` when needed. Bind upstream promoted identities with `--authority name=sha256:...` when they materially define the stage result. A stage receipt binds exact source provenance, predecessor receipt, artifact bytes, evidence bytes, optional authority hashes, and revision. Promotion advances the frontier and writes a checkpoint. A final-looking file without the active receipt is not complete.
+Bind material upstream identities with repeated `--authority name=sha256:...`. A stage receipt binds exact source provenance, predecessor receipt, artifact bytes, evidence bytes, optional authority hashes, and revision. A final-looking path without the active receipt is not complete.
 
 If review exposes an earlier cause, reopen that cause instead of compensating downstream:
 
@@ -74,80 +60,29 @@ If review exposes an earlier cause, reopen that cause instead of compensating do
 node <skill-root>/scripts/workspace.mjs reopen <run-dir> <stage> --reason "<cause>"
 ```
 
-Reopen creates new revision directories for the causal stage and every affected stage that had already started. It invalidates the selected active receipt plus all active descendants while preserving prior promoted bytes. If `resume` reports `reopen-required`, reopen at the reported earliest invalid stage or an earlier causal stage, never later.
+Reopen creates new revision directories for the causal stage and every affected stage that had already started, invalidates the selected active receipt plus all active descendants, and preserves prior promoted bytes. If resume reports `reopen-required`, reopen at the reported stage or an earlier causal stage, never later.
 
-## Semantic authoring and promotion
+## Core promotion chain
 
-1. Understand provenance, audience, target profile, exclusions, and the primary question.
-2. Extract claims and author `FigureSpec`.
-3. Gate with `node <skill-root>/scripts/validate.mjs <figure-spec.json> --mode gate`.
-4. Repair semantic causes until zero errors.
-5. Promote with the same command and `--promote`.
-6. Only `validated_figure` is semantic authority downstream.
+Semantic authoring: extract claims, author `FigureSpec`, gate with `validate.mjs`, repair semantic causes, and treat only `validated_figure` as downstream semantic authority.
 
-## Grammar resolution and promotion
+Grammar: choose exactly one registered root grammar, bind required roles/variant/axis, gate with `grammar.mjs`, and treat only `GrammarPlan` as grammar authority.
 
-1. Start from promoted semantic authority.
-2. Choose exactly one root grammar from the installed registry.
-3. Bind required semantic roles, registered variant, and reading axis.
-4. Gate with `node <skill-root>/scripts/grammar.mjs <figure-spec.json> --mode gate`.
-5. Repair `GRM` failures at type, role, cardinality, relation, order, cycle, composition, split, or hybrid cause.
-6. Promote and treat only `GrammarPlan` as grammar authority for layout.
+Visual binding: bind every semantic node to one registered core or validated custom primitive, gate with `visual.mjs`, and treat only `PrimitivePlan` as primitive-bound visual authority. Thesis-bearing novel structure that loses meaning as a generic archetype requires a custom primitive.
 
-## Visual binding and promotion
+Profile: choose an explicit target viewport/profile/safe area/options, gate with `profile.mjs`, never shrink below primitive/profile floors, and treat only `ProfilePlan` as strengthened measurement/spacing authority.
 
-1. Bind every semantic node to exactly one registered core or validated custom primitive.
-2. Declare variant, salience, props, and only state channels exposed by the primitive.
-3. Use a custom primitive for thesis-bearing or novel structure that would lose meaning as a generic archetype.
-4. Gate with `node <skill-root>/scripts/visual.mjs <figure-spec.json> <visual-spec.json> --mode gate`.
-5. Repair `PRM` failures at binding, registry, intrinsic-size, interface, state-channel, salience, custom-definition, or purity owner.
-6. Promote and treat only `PrimitivePlan` as primitive-bound visual authority.
+Layout: run `layout.mjs` from matching promoted semantic/grammar/visual/profile artifacts. Treat only `ResolvedLayout` as actual box, anchor, and connector geometry authority. Never patch renderer CSS to hide a layout failure.
 
-## Profile resolution and promotion
+Static rendering: run `render.mjs`, repair `RND` failures at their semantic/primitive/profile/layout owner, and treat only promoted `rendered_svg` as the certified static derivative. Serialized render evidence does not by itself certify browser-shaped glyph extents or platform-font identity.
 
-1. Choose one explicit target viewport, matching profile, safe area, and layout options.
-2. Gate with `node <skill-root>/scripts/profile.mjs <figure-spec.json> <visual-spec.json> <layout-target.json> --mode gate`.
-3. Repair `PRF` failures at target, density, spacing, or motion-storyboard owner. Never shrink below primitive/profile floors.
-4. Promote and treat only `ProfilePlan` as profile-strengthened measurement and spacing authority.
+Motion: use only when sequence, transfer, propagation, state change, accumulation, routing, or comparison becomes clearer. Author semantic beats/effects/cues in `MotionSpec`; do not author resolved coordinates, SVG paths, CSS keyframes, or callbacks. Gate with `motion.mjs` and treat only `MotionProgram` as executable motion authority. Seeking is event-sourced from initial semantic state.
 
-## Deterministic layout and promotion
-
-1. Start from matching promoted semantic, grammar, primitive, and profile artifacts.
-2. Run `node <skill-root>/scripts/layout.mjs <figure-spec.json> <visual-spec.json> <layout-target.json> --mode gate`.
-3. Repair `LAY` failures at layout or the upstream authority that caused them. Do not patch renderer CSS.
-4. Promote and treat only `ResolvedLayout` as actual box, anchor, and connector geometry authority.
-
-## Static rendering and promotion
-
-1. Run `node <skill-root>/scripts/render.mjs <figure-spec.json> <visual-spec.json> <layout-target.json> --mode gate`.
-2. Repair `RND` failures at semantic state, primitive, profile token, or layout owner.
-3. Promote with `--promote`; use `--out <figure.svg>` and `--evidence <evidence.json>` when files are needed.
-4. Treat only promoted `rendered_svg` as the certified static derivative for that layout/profile target.
-5. Renderer evidence certifies serialized SVG facts such as explicit type size, stroke, contrast, grayscale, coverage, and purity. It does not by itself certify browser-shaped glyph extents or platform-font identity.
-6. Do not hand-edit generated SVG and claim promotion.
-
-## Semantic motion and promotion
-
-Use motion only when it clarifies sequence, transfer, propagation, state change, accumulation, routing, or comparison.
-
-1. Author `MotionSpec` with integer-millisecond semantic beats, state effects, and cues. Do not author resolved coordinates, SVG paths, CSS keyframes, or callbacks.
-2. Gate with `node <skill-root>/scripts/motion.mjs <figure-spec.json> <visual-spec.json> <layout-target.json> <motion-spec.json> --mode gate`.
-3. Repair profile motion-envelope failures before downstream `MOT` failures.
-4. Promote and treat only `MotionProgram` as executable motion authority.
-5. Seeking is event-sourced from initial semantic state, never from the previous DOM frame.
-6. If motion is intentionally absent in a resumable run, promote an explicit no-motion decision artifact and evidence for the motion execution stage rather than skipping it.
-
-## Self-contained document and promotion
-
-1. Start after semantic, grammar, primitive, profile, layout, and static rendering promotion. Include motion authority only when explanatory motion exists.
-2. Run `node <skill-root>/scripts/document.mjs <figure-spec.json> <visual-spec.json> <layout-target.json> [motion-spec.json] --mode gate`.
-3. Repair `DOC` failures at canonical input, authority chain, target, render, motion, manifest hash, or runtime purity.
-4. Promote with `--promote --out <figure.html>` for delivery.
-5. Runtime mode is only view state. DOM/CSS state is never semantic or geometry authority.
+Single-target document: after semantic, grammar, primitive, profile, layout, rendering, and optional motion promotion, run `document.mjs`. Treat runtime mode as ephemeral view state; DOM/CSS state is never semantic or geometry authority.
 
 ## Browser text review and promotion
 
-Run browser text review after the matching document and rendered SVG have promoted and before treating visual review as complete.
+Run browser text review after the matching document and rendered SVG have promoted and before visual review is considered complete:
 
 ```bash
 node <skill-root>/scripts/browser-text.mjs \
@@ -155,25 +90,33 @@ node <skill-root>/scripts/browser-text.mjs \
   --mode gate
 ```
 
-The bundled adapter launches Chrome or Chromium through the DevTools pipe, injects the exact promoted SVG bytes into an isolated evidence-only `about:blank` harness, waits for browser fonts, measures SVG glyph bounds, and asks Chrome which platform fonts actually supplied glyphs. It does not navigate to the public internet and has no Puppeteer or Playwright dependency.
+The bundled adapter launches Chrome or Chromium through the DevTools pipe, injects exact promoted SVG bytes into an evidence-only `about:blank` harness, waits for fonts, measures SVG glyph bounds, and asks Chrome which platform fonts supplied glyphs. It performs no public-network navigation and does not use Puppeteer or Playwright.
 
-1. Repair `TXT` failures at their source-copy, typography, primitive measurement, profile, layout, or environment cause. Never move or shrink content in the evidence layer.
-2. Promote with the same command and `--promote --out <browser-text-evidence.json>`.
-3. Use `--observation-out <observation.json>` when the raw environment-bound browser measurement must be retained.
-4. Bind the promoted browser text evidence and, when useful, its observation into the execution workspace `review` receipt.
-5. `browser_text_extent_certified` means actual browser glyph bounds passed coverage, visibility, owner-box, viewport, overlap, and profile font-size checks for the recorded environment.
-6. `platform_font_identity_certified` means Chrome reported the actual platform font families and glyph counts used by every measured label. It is environment-specific evidence, not a promise that every platform chooses the same font.
-7. If no supported Chrome/Chromium executable is available, the review fails explicitly. Never replace browser evidence with estimated text metrics and claim a pass.
+Repair `TXT` failures at their source-copy, typography, primitive measurement, profile, layout, or environment owner. The evidence layer may reject copy or geometry but may never move, resize, reroute, or rewrite it to manufacture a pass. Promote with `--promote --out <browser-text-evidence.json>`; retain raw observation with `--observation-out` when needed. Browser/platform font identity is environment-specific evidence, not a cross-platform identity promise.
+
+## Multi-target document packaging
+
+Use multi-target packaging only after deciding that one delivery must contain two or more real target authorities. Do not create a "mobile" target by scaling a desktop target.
+
+A package request supplies at least two inline layout targets. The package CLI reruns the complete target-specific chain independently for every entry. The target profile may differ from the base FigureSpec profile; the CLI changes only profile selection before semantic promotion and verifies that all packaged children preserve the same semantic figure content apart from profile.
+
+```bash
+node <skill-root>/scripts/package.mjs \
+  <figure-spec.json> <visual-spec.json> <package-request.json> [motion-spec.json] \
+  --promote --out <figure.package.html>
+```
+
+Each target gets its own profile plan, resolved layout, rendered SVG, optional motion promotion, and self-contained document promotion. A target entry may override `motion`; `null` means explicit no-motion for that target. Motion still has to satisfy that target profile.
+
+The resulting `DocumentPackage` binds exact child document hashes and embeds their exact HTML bytes. The package runtime may select among embedded targets but may not recompute geometry, synthesize missing targets, or use CSS geometry scaling. A host viewport smaller than a target scrolls the exact target rather than silently shrinking it.
+
+Use `window.FigthreadPackage.listTargets()` and `activateTarget(id)` only as view selection over already promoted child documents. If one target fails layout, browser text evidence, motion, or document promotion, repair that target upstream before packaging.
 
 ## Export derivatives and promotion
 
-1. Start from the promoted self-contained document and matching rendered SVG.
-2. Author `ExportSpec` with exact document ID, target, profile, format, frame, background, scale, and live-text policy.
-3. Gate with `node <skill-root>/scripts/export.mjs <figure-spec.json> <visual-spec.json> <layout-target.json> [motion-spec.json] <export-spec.json> --mode gate`.
-4. Repair `EXP` failures at request, source authority, target, frame, vector eligibility, text policy, capture, or purity owner.
-5. Promote HTML or SVG with `--promote --out <artifact>`.
-6. PNG promotion requires a conforming browser capture adapter. Without one, preserve the capture plan and fail rather than inventing a second raster renderer.
-7. Treat only `ExportArtifact` as a certified delivery derivative.
+Start from the promoted self-contained single-target document and matching rendered SVG. Author `ExportSpec`, gate with `export.mjs`, repair `EXP` failures at request/source/target/frame/vector/text/capture/purity owner, and treat only `ExportArtifact` as a certified derivative. HTML preserves exact promoted document bytes. Standalone SVG originates from promoted static SVG. PNG requires a conforming browser capture adapter and must fail closed if none is available.
+
+Multi-target package HTML is a delivery container of independently promoted documents; do not pass it through the single-target export API as though it were one target. Export a selected child target through its own promoted document/render authority, or deliver the promoted package HTML itself.
 
 ## Authority model
 
@@ -184,25 +127,22 @@ The bundled adapter launches Chrome or Chromium through the DevTools pipe, injec
 - `LayoutIntent` owns layout intent; `ResolvedLayout` alone owns actual boxes, anchors, and connector geometry.
 - The renderer owns deterministic SVG serialization and serialized rendered-profile evidence, not semantic or geometry reinterpretation.
 - `MotionSpec` owns semantic timing/effects/cues; `MotionProgram` owns deterministic compiled tracks resolved against promoted layout.
-- The document manifest binds canonical input hashes to compiled authority hashes and the exact self-contained runtime build.
-- `BrowserTextPlan` binds the exact promoted document/render/layout/profile/target and semantic text that must be checked.
-- `BrowserTextObservation` records browser-measured glyph, computed-style, font-loading, platform-font, and environment facts.
-- `BrowserTextEvidence` certifies a valid observation against its plan; it cannot own or modify copy or geometry.
-- `ExportSpec` selects a derivative; `ExportPlan` binds that request to promoted sources; `ExportArtifact` owns derivative bytes and evidence.
-- The run manifest owns the active execution frontier and revision counters.
-- Stage receipts own immutable evidence-bound promotion history. Checkpoints own resumable snapshots of the active receipt set.
-- Browser/runtime/export projection state is ephemeral and may not be promoted upstream as semantic or geometry authority.
+- The document manifest binds canonical input hashes to compiled authority hashes and the exact self-contained single-target runtime build.
+- `BrowserTextPlan`, browser observation, and `BrowserTextEvidence` bind and certify browser-shaped text facts without owning copy or geometry.
+- `DocumentPackage` owns target membership, target order/default selection, exact child document bytes/hashes, and package runtime selection policy. It owns no child geometry.
+- `ExportSpec`, `ExportPlan`, and `ExportArtifact` own derivative selection, source binding, and derivative bytes/evidence.
+- The run manifest owns the active execution frontier and revision counters. Stage receipts own immutable evidence-bound history; checkpoints own resumable snapshots.
+- Browser/runtime/package/export projection state is ephemeral and may not be promoted upstream as semantic or geometry authority.
 
 ## Recovery and execution invariants
 
-- The run directory is external memory; fresh workers resume from it rather than relying on chat history.
-- Only one writer may mutate a run at a time. Mutating commands use an exclusive writer lock.
-- Use `recover-lock` only after confirming a writer crashed; recovery is audit-recorded.
-- Promoted receipts and checkpoints are immutable. Reopen creates new revisions; it never patches old history or reuses started revision directories.
+- The run directory is external memory; fresh workers resume from disk rather than chat history.
+- Only one writer may mutate a run. Use lock recovery only after confirming a crash; recovery is audit-recorded.
+- Promoted receipts/checkpoints are immutable. Reopen creates new revisions and never reuses started revision directories.
 - Changed or missing promoted artifact/evidence bytes invalidate the stage that bound them.
-- Reopen automatically invalidates all active descendants of the causal stage.
-- A changed intake source or untrustworthy run manifest cannot be hidden by reopen; restore provenance or start a new run.
-- Artifacts must remain inside the active revision directory, except final export artifacts may be bound under `final/`.
+- Reopen invalidates all active descendants of the causal stage.
+- A changed intake source or untrustworthy run manifest cannot be hidden by reopen.
+- Artifacts remain inside the active revision directory except final export artifacts may be bound under `final/`.
 - Paths may never escape the run directory.
 
 ## Non-negotiables
@@ -211,28 +151,23 @@ The bundled adapter launches Chrome or Chromium through the DevTools pipe, injec
 - Every downstream stage consumes promoted upstream authority only.
 - Every figure has exactly one promoted root grammar before layout promotion.
 - Every semantic node has exactly one visual binding before profile/layout promotion.
-- Thesis-bearing novel structure requires a custom primitive.
-- Custom SVG may not contain scripts, event handlers, foreign objects, or external references.
 - Primitive minimums and profile floors are hard floors.
 - Browser/CSS auto-layout is never canonical geometry.
-- `LayoutIntent` contains no resolved global geometry.
 - Static rendering uses the declared semantic summary snapshot, never an arbitrary animation frame.
 - Color cannot be the sole discriminator for explanatory meaning.
-- Browser text evidence may reject promoted geometry or copy but may never mutate either one to manufacture a pass.
-- Browser-resolved font identity is bound to the recorded environment; do not generalize it into cross-platform binary or font-selection identity.
-- Motion contains no executable callbacks or canonical resolved geometry.
-- Repeat motion explicitly restores initial semantic state before loop closure.
-- The generated HTML is self-contained and performs no external runtime I/O.
-- Static, print, reduced-motion, and default SVG export use the semantic summary state.
-- HTML export preserves exact promoted document bytes.
-- Standalone SVG export originates from the promoted static SVG and fails outside the vector-safe subset.
+- Browser text evidence may reject promoted geometry or copy but may never mutate either.
+- Motion contains no executable callbacks or canonical resolved geometry; repeat motion explicitly restores initial semantic state.
+- Generated HTML is self-contained and performs no external runtime I/O.
+- A multi-target package contains exact independently promoted child targets; CSS transform scaling is not a target authoring method.
+- Package target switching is view state, not a new layout authority.
+- Static, print, reduced-motion, and default SVG export use semantic summary state.
 - PNG is captured from promoted HTML; cross-platform screenshot binary identity is not claimed.
 - Draft mode is non-authoritative. Only gate promotion unlocks downstream authority.
-- Resolve `<skill-root>` from this installed skill; never substitute a user's project npm wrappers for the skill-local protocol.
+- Resolve `<skill-root>` from this installed skill; do not substitute project npm wrappers for the skill-local protocol.
 - If a capability is unsupported, fail explicitly or reopen the appropriate upstream decision. Never fabricate a pass.
 
 ## Current runtime capabilities
 
-The installed runtime supports semantic, grammar, primitive, profile, deterministic layout, static SVG, browser-resolved glyph-bound and platform-font evidence through a bundled zero-dependency Chrome/Chromium DevTools adapter, semantic motion, self-contained HTML, HTML/SVG export, browser-capture planning for PNG, and resumable evidence-bound execution with source provenance, immutable stage receipts, content-hashed checkpoints, single-writer locking, revisioned reopen, stale-descendant invalidation, exact artifact/evidence verification, and fresh-worker resume.
+The installed runtime supports semantic, grammar, primitive, profile, deterministic layout, static SVG, browser-resolved glyph-bound and platform-font evidence through a bundled Chrome/Chromium DevTools adapter, semantic motion, self-contained single-target HTML, self-contained multi-target HTML packages built from exact promoted child documents, HTML/SVG single-target export, browser-capture planning for PNG, and resumable evidence-bound execution.
 
-Topology-specific radial solving, multi-target document packaging, and an installed PNG capture adapter remain outside the runtime. Keep those limitations explicit.
+Topology-specific radial solving and an installed PNG capture adapter remain outside the runtime. Keep those limitations explicit.
