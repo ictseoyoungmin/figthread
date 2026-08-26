@@ -72,7 +72,7 @@ Visual binding: bind every semantic node to one registered core or validated cus
 
 Profile: choose an explicit target viewport/profile/safe area/options, gate with `profile.mjs`, never shrink below primitive/profile floors, and treat only `ProfilePlan` as strengthened measurement/spacing authority.
 
-Layout: run `layout.mjs` from matching promoted semantic/grammar/visual/profile artifacts. Treat only `ResolvedLayout` as actual box, anchor, and connector geometry authority. Never patch renderer CSS to hide a layout failure.
+Layout: run `layout.mjs` from matching promoted semantic/grammar/visual/profile artifacts. Left-right and top-down layouts are deterministic linear solves; registered radial lifecycle, feedback-loop, network, and hub-spoke layouts use deterministic topology-specific ring/hub solving. Treat only `ResolvedLayout` as actual box, anchor, and connector geometry authority. Never patch renderer CSS to hide a layout failure.
 
 Static rendering: run `render.mjs`, repair `RND` failures at their semantic/primitive/profile/layout owner, and treat only promoted `rendered_svg` as the certified static derivative. Serialized render evidence does not by itself certify browser-shaped glyph extents or platform-font identity.
 
@@ -153,6 +153,7 @@ Multi-target package HTML is a delivery container of independently promoted docu
 - Every semantic node has exactly one visual binding before profile/layout promotion.
 - Primitive minimums and profile floors are hard floors.
 - Browser/CSS auto-layout is never canonical geometry.
+- Radial layout must preserve the registered semantic hub/ring topology and composition order; it may not switch to stochastic placement when space is tight.
 - Static rendering uses the declared semantic summary snapshot, never an arbitrary animation frame.
 - Color cannot be the sole discriminator for explanatory meaning.
 - Browser text evidence may reject promoted geometry or copy but may never mutate either.
@@ -168,6 +169,6 @@ Multi-target package HTML is a delivery container of independently promoted docu
 
 ## Current runtime capabilities
 
-The installed runtime supports semantic, grammar, primitive, profile, deterministic layout, static SVG, browser-resolved glyph-bound and platform-font evidence through a bundled Chrome/Chromium DevTools adapter, semantic motion, self-contained single-target HTML, self-contained multi-target HTML packages built from exact promoted child documents, HTML/SVG single-target export, browser-capture planning for PNG, and resumable evidence-bound execution.
+The installed runtime supports semantic, grammar, primitive, profile, deterministic left-right/top-down layout, topology-specific deterministic radial ring/hub layout, static SVG, browser-resolved glyph-bound and platform-font evidence through a bundled Chrome/Chromium DevTools adapter, semantic motion, self-contained single-target HTML, self-contained multi-target HTML packages built from exact promoted child documents, HTML/SVG single-target export, browser-capture planning for PNG, and resumable evidence-bound execution.
 
-Topology-specific radial solving and an installed PNG capture adapter remain outside the runtime. Keep those limitations explicit.
+Generic force-directed graphs, automatic multi-ring radial packing, and an installed PNG capture adapter remain outside the runtime. Keep those limitations explicit.
