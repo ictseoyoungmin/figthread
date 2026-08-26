@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://figthread.dev/schemas/document-manifest/0.1",
+  "title": "Figthread document manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "document_id", "canonical", "compiled", "runtime", "compile_key", "build_hash"],
+  "properties": {
+    "schema_version": { "const": "figthread.document/0.1" },
+    "document_id": { "type": "string", "pattern": "^document:[a-z0-9][a-z0-9._-]*$" },
+    "canonical": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["figure", "visual", "target", "motion", "canonical_hash"],
+      "properties": {
+        "figure": { "type": "object" },
+        "visual": { "type": "object" },
+        "target": { "type": "object" },
+        "motion": { "type": ["object", "null"] },
+        "canonical_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      }
+    },
+    "compiled": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authorities", "grammar_plan", "primitive_plan", "profile_plan", "resolved_layout", "rendered", "motion_program"],
+      "properties": {
+        "authorities": { "type": "object" },
+        "grammar_plan": { "type": "object" },
+        "primitive_plan": { "type": "object" },
+        "profile_plan": { "type": "object" },
+        "resolved_layout": { "type": "object" },
+        "rendered": { "type": "object" },
+        "motion_program": { "type": ["object", "null"] }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target_id", "profile", "initial_mode", "allowed_modes", "has_motion", "duration_ms"],
+      "properties": {
+        "target_id": { "type": "string", "minLength": 1 },
+        "profile": { "type": "string", "minLength": 1 },
+        "initial_mode": { "type": "string", "enum": ["interactive", "clean", "static"] },
+        "allowed_modes": { "type": "array", "minItems": 3, "items": { "type": "string", "enum": ["interactive", "clean", "static", "error"] } },
+        "has_motion": { "type": "boolean" },
+        "duration_ms": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "compile_key": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "build_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  }
+}
