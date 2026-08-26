@@ -10,7 +10,7 @@ description: >-
 
 Figure first, motion second.
 
-Semantic figure state must be validated and promoted before grammar, visual, profile, layout, render, or motion work may depend on it. One canonical figure grammar must then be validated and promoted before layout treats reading order, topology, or composition rules as authoritative. Visual binding must be validated and promoted before a profile may strengthen readability and density constraints. A promoted profile plan must exist before layout treats measurements or target spacing as authoritative. Deterministic layout must be validated and promoted before rendering or motion treats geometry as authoritative. Static rendering must consume the promoted semantic summary snapshot and audit the SVG it actually emitted. Semantic motion must satisfy both the selected profile envelope and semantic motion validation before a runtime treats animation tracks as authoritative. Do not bypass an upstream promotion gate.
+Semantic figure state must be validated and promoted before grammar, visual, profile, layout, render, motion, or document work may depend on it. One canonical figure grammar must then be validated and promoted before layout treats reading order, topology, or composition rules as authoritative. Visual binding must be validated and promoted before a profile may strengthen readability and density constraints. A promoted profile plan must exist before layout treats measurements or target spacing as authoritative. Deterministic layout must be validated and promoted before rendering or motion treats geometry as authoritative. Static rendering must consume the promoted semantic summary snapshot and audit the SVG it actually emitted. Semantic motion must satisfy both the selected profile envelope and semantic motion validation before a runtime treats animation tracks as authoritative. The final document may compose those promoted authorities into one self-contained HTML runtime, but DOM or CSS state may never replace them. Do not bypass an upstream promotion gate.
 
 ## Required reading
 
@@ -52,6 +52,11 @@ When motion adds explanatory value, also read:
 1. `references/motion-ir.md`
 2. `schemas/motion-spec.schema.json`
 3. `templates/motion-spec.json`
+
+Before packaging the final HTML document, also read:
+
+1. `references/document-runtime.md`
+2. `schemas/document-manifest.schema.json`
 
 ## Semantic authoring and promotion
 
@@ -125,6 +130,17 @@ Use motion only when it explains sequence, transfer, propagation, state change, 
 7. Treat only the promoted `MotionProgram` as executable motion authority.
 8. Seeking must be event-sourced from initial semantic state. Never derive a seek result from the previous DOM frame.
 
+## Self-contained document and promotion
+
+1. Start only after semantic, grammar, primitive, profile, layout, and static rendering have promoted successfully. Include a promoted `MotionProgram` only when explanatory motion is present.
+2. Run `node <skill-root>/scripts/document.mjs <figure-spec.json> <visual-spec.json> <layout-target.json> [motion-spec.json] --mode gate`.
+3. Repair `DOC` failures at their canonical input, authority chain, target, render, motion, manifest hash, or runtime-purity owner. Do not patch the generated HTML by hand.
+4. Promote with the same command and `--promote`; use `--out <figure.html>` for delivery.
+5. Use `--runtime-mode interactive|clean|static` only to choose initial view state. Runtime mode is not semantic authority.
+6. Treat only the promoted `figthread_document` as the canonical self-contained HTML derivative for the exact embedded authority chain.
+7. The embedded bootstrap verifies its build hash, canonical hash, compile key, target viewport, and external-dependency boundary before reporting ready.
+8. Runtime seeking is event-sourced. Temporary cue overlays and DOM styles are ephemeral projections and must never be promoted upstream.
+
 ## Authority model
 
 - `FigureSpec` owns meaning and semantic state domains.
@@ -140,9 +156,11 @@ Use motion only when it explains sequence, transfer, propagation, state change, 
 - The static SVG renderer owns deterministic SVG serialization, core primitive drawing implementation, profile-safe visual tokens, and rendered-profile evidence; it may not change promoted geometry or semantics.
 - `MotionSpec` owns semantic timing, state effects, and cues, but no resolved geometry.
 - `MotionProgram` owns deterministic compiled tracks whose geometry is resolved from `ResolvedLayout`.
+- The document manifest binds canonical input hashes to compiled authority hashes and the exact single-target runtime build.
+- The browser document runtime owns only ephemeral playback, mode, controls, cue overlays, and inspection state.
 - Semantic relations remain in `FigureSpec`; the router chooses anchors and paths only after boxes freeze.
 - Browser or CSS auto-layout is never canonical geometry.
-- View/runtime state must not silently mutate promoted semantic, grammar, visual, profile, layout, render, or motion state.
+- View/runtime state must not silently mutate promoted semantic, grammar, visual, profile, layout, render, motion, or document state.
 
 ## Non-negotiables
 
@@ -167,9 +185,14 @@ Use motion only when it explains sequence, transfer, propagation, state change, 
 - Render evidence is content-hashed and must fail on emitted font/stroke/contrast/grayscale/purity violations that the installed renderer claims to certify.
 - Color must not be the sole visual discriminator for emphasis or state.
 - `MotionSpec` must not contain resolved geometry or executable callbacks.
+- The generated HTML must be self-contained and must not require external scripts, stylesheets, fonts, images, iframes, or network calls.
+- Browser bootstrap must fail closed on manifest, schema, hash, compile-key, target, or purity mismatch.
+- DOM/CSS/runtime state is ephemeral and may not become semantic or geometry authority.
+- `static` document mode uses the declared semantic summary state rather than an arbitrary motion frame.
 - Same promoted figure + grammar plan + primitive plan + profile plan + engine version must produce the same layout hash.
 - Same promoted semantic/grammar/visual/profile/layout authorities + render engine version must produce the same SVG/render hashes.
 - Same promoted figure + promoted layout + canonical motion input + motion engine version must produce the same motion program hash.
+- Same canonical inputs + promoted compiled authorities + document engine version must produce the same document build and HTML hashes.
 - Force-directed and stochastic layout are not allowed fallbacks.
 - Motion evaluation uses integer milliseconds and deterministic event ordering.
 - `add` is allowed only for numeric/count/ratio state domains; every resulting value must remain inside the declared domain.
@@ -182,6 +205,6 @@ Use motion only when it explains sequence, transfer, propagation, state change, 
 
 ## Current runtime capabilities
 
-The installed runtime supports semantic validation, a content-hashed twelve-grammar registry with role/topology/order/split validation, a hash-verified core primitive registry, custom primitive validation, a hash-verified five-profile threshold registry, deterministic profile-owned label/spacing refinement, semantic density gating, presentation safe-margin gating, profile motion-envelope validation, left-right/top-down layout with orthogonal routing, deterministic static SVG rendering for all bundled core primitive families, rendered SVG audits for explicit typography/stroke/contrast/grayscale/purity evidence, and deterministic semantic motion compilation/evaluation for state effects and `reveal`, `focus`, `transfer`, `trace`, and `morph-state` cues.
+The installed runtime supports semantic validation, a content-hashed twelve-grammar registry with role/topology/order/split validation, a hash-verified core primitive registry, custom primitive validation, a hash-verified five-profile threshold registry, deterministic profile-owned label/spacing refinement, semantic density gating, presentation safe-margin gating, profile motion-envelope validation, left-right/top-down layout with orthogonal routing, deterministic static SVG rendering for all bundled core primitive families, rendered SVG audits for explicit typography/stroke/contrast/grayscale/purity evidence, deterministic semantic motion compilation/evaluation for state effects and `reveal`, `focus`, `transfer`, `trace`, and `morph-state` cues, and deterministic self-contained single-target HTML composition with fail-closed bootstrap and inspection API.
 
-Browser-resolved glyph extents and font fallback identity, topology-specific radial solving, animated HTML runtime composition, and final export packaging are not yet available. When one of those checks is required, fail closed or preserve it as explicit audit evidence rather than pretending the current deterministic renderer has proved it.
+Browser-resolved glyph extents and font fallback identity, topology-specific radial solving, multi-target document packaging, and PNG/final export packaging are not yet available. When one of those checks is required, fail closed or preserve it as explicit audit evidence rather than pretending the current runtime has proved it.
