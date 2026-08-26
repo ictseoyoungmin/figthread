@@ -1,0 +1,13 @@
+{
+  "schema_version": "figthread.export/0.1",
+  "id": "export:minimal-png",
+  "document_id": "document:minimal-pipeline",
+  "target_id": "web-wide",
+  "profile": "technical-explainer",
+  "format": "png",
+  "frame": {"kind": "static-summary"},
+  "background": "profile",
+  "scale": 1,
+  "live_text": false,
+  "extensions": {}
+}
