@@ -1,6 +1,8 @@
 # Figthread
 
-Figthread is a semantic figure authoring system. The implementation now covers ten promoted development slices:
+Figthread is a semantic figure authoring system whose canonical delivery surface is a self-contained HTML document with deterministic static SVG and optional semantic motion.
+
+The implementation covers ten promoted development slices:
 
 - **D-001** — FigureSpec structural + semantic gate
 - **D-002** — LayoutIntent + deterministic ResolvedLayout gate
@@ -13,11 +15,15 @@ Figthread is a semantic figure authoring system. The implementation now covers t
 - **D-009** — content-addressed HTML/SVG export + browser-evidenced PNG capture gate
 - **D-010** — resumable run directory + immutable StageReceipt/checkpoint/reopen gate
 
+Version **1.0.1** adds the first full benchmark dogfood over those slices and fixes a history-preservation defect exposed by that run.
+
 Browser-resolved glyph extent proof, topology-specific radial solving, multi-target packaging, and a bundled browser PNG capture adapter remain outside the current runtime.
 
 ## Source of truth
 
-The installable skill under `skills/figthread/` is the runtime source of truth. Important execution additions are:
+The installable skill under `skills/figthread/` is the runtime source of truth. Root `src/`, `schemas/`, `grammars/`, `profiles/`, `examples/`, `benchmarks/`, and `test/` are repository development mirrors and harnesses, not a second runtime implementation.
+
+Important execution files are:
 
 - `skills/figthread/runtime/execution.js` — run initialization, verification, promotion receipts, checkpoints, reopen, resume, and writer-lock recovery
 - `skills/figthread/scripts/workspace.mjs` — skill-local workspace CLI
@@ -25,8 +31,6 @@ The installable skill under `skills/figthread/` is the runtime source of truth. 
 - `skills/figthread/schemas/run-manifest.schema.json` — mutable run-state contract
 - `skills/figthread/schemas/stage-receipt.schema.json` — immutable stage-promotion record
 - `skills/figthread/schemas/checkpoint.schema.json` — resumable active-state snapshot
-
-The existing semantic, grammar, primitive, profile, layout, render, motion, document, and export runtimes remain under the same installed skill tree. Root `src/`, `schemas/`, `grammars/`, `profiles/`, `examples/`, and `test/` are development mirrors/harnesses, not a second implementation.
 
 ## Promotion and execution model
 
@@ -37,26 +41,23 @@ source bytes
   -> claims receipt
   -> FigureSpec / semantic promotion
   -> grammar + visual promotion
-  -> profile + layout promotion
-  -> render + optional motion promotion
+  -> profile + layout + exact static render
+  -> optional semantic motion promotion
   -> self-contained document promotion
   -> exact artifact review
   -> export promotion
   -> completed run
 ```
 
-The execution layer does not replace the figure promotion chain. It records which exact artifacts and evidence proved each stage and which revisions remain active.
+The execution layer does not replace semantic, grammar, visual, profile, layout, render, motion, document, or export authority. It records which exact artifacts and evidence proved each stage and which causal revisions remain active.
 
 ```text
-run manifest
-  -> active frontier + revisions
-
 StageReceipt
   -> source hash
   -> predecessor receipt hash
   -> artifact byte hashes
   -> evidence byte hashes
-  -> optional authority hashes
+  -> optional promoted authority hashes
 
 checkpoint
   -> active receipt set
@@ -65,33 +66,59 @@ checkpoint
   -> previous checkpoint hash
 ```
 
-A file path, screenshot, or conversation claim is not completion proof. Completion requires a valid active receipt for every stage.
+A file path, screenshot, or conversation claim is not completion proof. Completion requires a valid active receipt for every execution stage.
 
-## Run directory
+## Full benchmark dogfood
+
+`benchmarks/e2e-dogfood/` drives the actual runtime through the complete long-running workflow rather than testing validators in isolation.
+
+The benchmark source requires the terminal pipeline node to be named **Delivered Result**. The first semantic revision deliberately uses the weaker label **Output**. That revision passes core semantic/grammar/visual/layout/render gates, proving that a later exact-artifact review is still necessary for source fidelity.
+
+The benchmark then performs this lifecycle:
 
 ```text
-run-<date>-<source8>/
-├── run.json
-├── intake/
-├── stages/
-│   ├── 01-understanding/
-│   ├── 02-claims/
-│   ├── 03-figure-ir/
-│   ├── 04-grammar-visual/
-│   ├── 05-layout/
-│   ├── 06-motion/
-│   ├── 07-document/
-│   ├── 08-review/
-│   └── 09-export/
-├── receipts/
-├── checkpoints/
-├── evidence/
-├── logs/
-├── final/
-└── tmp/
+worker A
+  source -> understanding -> claims -> figure-ir
+  -> grammar/visual -> profile/layout/render
+  -> checkpoint -> process exits
+
+worker B
+  resume from run directory at motion
+  -> motion -> document -> exact artifact review
+  -> review detects source wording loss
+  -> reopen figure-ir
+  -> regenerate every affected descendant
+  -> review PASS -> SVG export -> complete run
 ```
 
-Each active stage receives a revision directory such as `stages/03-figure-ir/r0001/`. Reopen creates `r0002`, `r0003`, and so on rather than changing prior promoted history.
+The two workers are separate Node processes. Worker B reconstructs promoted authority from stage artifacts rather than process memory or conversation history.
+
+The first dogfood exposed a real execution bug: reopening an upstream stage reset downstream revision counters, allowing a later pass to reuse `r0001` directories. That violated the immutable-history contract. The runtime now advances every already-started affected stage to a new revision, including the open downstream frontier, while never incrementing stages that have genuinely never started.
+
+For the benchmark review-time reopen, the repaired causal branch is:
+
+```text
+figure-ir       r0002
+grammar-visual  r0002
+layout          r0002
+motion          r0002
+document        r0002
+review          r0002
+export          r0002
+```
+
+The regression harness asserts that prior `r0001` document bytes remain byte-identical after the repaired run finishes.
+
+Run the benchmark:
+
+```bash
+npm run benchmark:dogfood
+```
+
+Detailed scenario and finding notes live in:
+
+- `benchmarks/e2e-dogfood/README.md`
+- `benchmarks/e2e-dogfood/FINDINGS.md`
 
 ## Workspace commands
 
@@ -106,36 +133,13 @@ npm run workspace -- checkpoint ./runs/run-... --reason "handoff"
 npm run workspace -- recover-lock ./runs/run-... --reason "confirmed crashed worker"
 ```
 
-The skill-facing instructions use `node <skill-root>/scripts/workspace.mjs ...`; repository npm commands above are only developer conveniences.
-
-## D-010 guarantees
-
-- run source is copied into `intake/` and bound by exact byte hash and byte length
-- run manifest is content-hashed and updated atomically
-- nine fixed execution stages define one active frontier
-- every promoted stage requires at least one exact artifact and one exact evidence file
-- artifact/evidence paths cannot escape the run directory
-- normal stage artifacts must live under the active revision directory; final export artifacts may also be bound under `final/`
-- StageReceipt records are immutable and content-addressed
-- receipt chains bind each stage to source provenance and the immediate promoted predecessor
-- optional promoted authority hashes can be embedded in receipts
-- every promotion creates a content-hashed checkpoint
-- checkpoints form a previous-hash chain and snapshot active receipts, revisions, and frontier
-- verification re-hashes source, receipts, artifacts, evidence, and the latest checkpoint
-- resume finds the earliest invalid stage and returns a fresh-worker packet without conversation history
-- reopen increments the causal stage revision and automatically invalidates all active descendants
-- invalidated receipts/files remain preserved for audit
-- changed promoted artifact/evidence bytes can be recovered by reopening the earliest invalid stage
-- changed intake provenance or an invalid run manifest cannot be hidden by reopen
-- mutating commands use one exclusive writer lock
-- stale-lock recovery is explicit and leaves a content-hashed audit record
-- full completion requires valid active receipts through export
-- installed skill prose remains free of internal roadmap codes and public contract-version labels
+The installed skill uses `node <skill-root>/scripts/workspace.mjs ...`; repository npm commands are developer conveniences.
 
 ## Figure pipeline commands
 
 ```bash
 npm test
+npm run benchmark:dogfood
 npm run validate:promote -- skills/figthread/examples/minimal.figure.json
 npm run grammar:promote -- skills/figthread/examples/minimal.figure.json
 npm run visual:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json
@@ -147,4 +151,6 @@ npm run document:promote -- skills/figthread/examples/minimal.figure.json skills
 npm run export:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json skills/figthread/examples/minimal.motion.json skills/figthread/examples/minimal.export.json --out figure.svg
 ```
 
-The next development bottleneck after execution closure is benchmark dogfooding: drive the full run protocol from source understanding through export with fresh-worker resume/reopen and use real evidence to expose remaining cross-stage defects.
+## Next bottleneck
+
+With the first full execution dogfood in place, the next strongest quality bottleneck is **browser-resolved text evidence**: certify actual font selection and glyph/text extents from the rendered document so typography overflow cannot remain an explicitly unproved renderer assumption.
