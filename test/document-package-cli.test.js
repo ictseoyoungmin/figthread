@@ -12,3 +12,5 @@ test("package CLI promotes a self-contained multi-target HTML",async()=>{
 });
 
 test("package schemas root mirrors match installed skill",async()=>{for(const name of ["document-package.schema.json","package-request.schema.json"]){const [a,b]=await Promise.all([readFile(new URL(`../skills/figthread/schemas/${name}`,import.meta.url),"utf8"),readFile(new URL(`../schemas/${name}`,import.meta.url),"utf8")]);assert.equal(a,b);}});
+
+test("package example root mirror matches installed skill",async()=>{const [a,b]=await Promise.all([readFile(new URL("../skills/figthread/examples/minimal.package.json",import.meta.url),"utf8"),readFile(new URL("../examples/minimal.package.json",import.meta.url),"utf8")]);assert.equal(a,b);});
