@@ -15,7 +15,7 @@ The implementation retains the ten promoted architecture slices closed through 1
 - **D-009** — content-addressed HTML/SVG export + browser-evidenced PNG capture contract
 - **D-010** — resumable run directory + immutable StageReceipt/checkpoint/reopen gate
 
-Version **1.0.1** added full fresh-worker benchmark dogfooding and repaired reopen revision reuse. Version **1.1.0** added actual Chrome-resolved glyph bounds and platform-font evidence. Version **1.2.0** added multi-target document packaging without turning CSS scaling or runtime resize into canonical geometry. Version **1.3.0** closed topology-specific deterministic radial layout for the registered radial grammar families. Version **1.4.0** installs the missing Chrome/Chromium PNG capture adapter and wires it into the export CLI.
+Version **1.0.1** added full fresh-worker benchmark dogfooding and repaired reopen revision reuse. Version **1.1.0** added actual Chrome-resolved glyph bounds and platform-font evidence. Version **1.2.0** added multi-target document packaging without turning CSS scaling or runtime resize into canonical geometry. Version **1.3.0** closed topology-specific deterministic radial layout for the registered radial grammar families. Version **1.4.0** installed the Chrome/Chromium PNG capture adapter and wired it into the export CLI. Version **1.5.0** adds browser-resolved full-SVG visual audit for all rendered text, classified custom geometry, and promoted relation connectors.
 
 Generic force-directed graph layout and automatic multi-ring radial packing remain intentionally unsupported.
 
@@ -32,6 +32,7 @@ source / claims
   -> ProfilePlan
   -> ResolvedLayout
   -> promoted static SVG
+  -> browser-resolved full-SVG visual audit
   -> optional MotionProgram
   -> self-contained FigthreadDocument
   -> browser-resolved text evidence
@@ -39,7 +40,9 @@ source / claims
   -> export
 ```
 
-The browser text stage measures the exact promoted SVG with Chrome/Chromium and certifies glyph bounds, computed typography, font readiness, actual platform-font attribution, visibility, owner/viewport containment, and cross-owner label overlap. It is evidence only; it cannot repair copy or geometry.
+The full-SVG visual audit measures exact browser geometry for rendered semantic labels, all custom-primitive text, classified visible custom geometry, and relation connectors. It certifies declared coverage, containment, visibility, text/mark collision clearance, connector clearance, and platform-font glyph evidence without becoming geometry authority.
+
+The browser text stage remains a document-bound typography check over semantic primary labels. It measures the exact promoted SVG in the document context and certifies glyph bounds, computed typography, font readiness, platform-font attribution, visibility, owner/viewport containment, and cross-owner label overlap. Neither browser evidence layer may repair copy or geometry.
 
 ## Deterministic layout
 
@@ -55,6 +58,23 @@ Radial support is deliberately tied to grammar semantics rather than offered as 
 The radial solver preserves promoted intrinsic minimums and profile spacing floors. It searches a fixed preferred-to-minimum size sequence and a fixed set of ring rotations, computes a legal ring radius against the exact safe area, and rejects any candidate with minimum-gap collision. Unsupported radial grammar/variant combinations fail with `LAY009_RADIAL_TOPOLOGY`; supported topologies that cannot fit at minimum geometry fail with `LAY001_UNSAT`.
 
 Nested children inside a radial hub/ring node use local deterministic top-down packing. Relations are still routed orthogonally from promoted boxes, using deterministic anchor selection and obstacle/crossing/bend/length scoring.
+
+## Full-SVG visual audit
+
+Serialized SVG checks cannot prove browser-resolved internal composition for complex custom primitives. The visual audit closes that gap with a zero-dependency Chrome/Chromium DevTools-pipe adapter over the exact promoted static SVG.
+
+Every custom `<text>` is automatically in audit scope. Visible custom geometry must be classifiable with `data-figthread-audit="container|essential|connector|decorative"`; existing `data-essential="true"` is accepted as `essential`. Unclassified visible geometry fails closed instead of being silently ignored.
+
+The audit checks exact element coverage, browser bounds, owner/viewport containment, custom-text internal padding, visibility, browser font readiness/platform-font glyph attribution, text-to-text collisions, text-to-protected-mark collisions, and connector clearance through text/protected regions. Browser measurement is derivative evidence only and cannot move, resize, reroute, or rewrite the promoted SVG.
+
+```bash
+npm run visual:audit:promote -- \
+  skills/figthread/examples/minimal.figure.json \
+  skills/figthread/examples/minimal.visual.json \
+  skills/figthread/examples/minimal.layout-target.json \
+  --out visual-audit-evidence.json \
+  --observation-out visual-audit-observation.json
+```
 
 ## Multi-target packaging
 
@@ -104,7 +124,7 @@ The evidence is environment-specific. Figthread does not claim that every OS res
 
 ## Installed PNG capture
 
-PNG export now uses a bundled zero-dependency Chrome/Chromium DevTools-pipe adapter. It does not reconstruct the figure through another raster renderer.
+PNG export uses a bundled zero-dependency Chrome/Chromium DevTools-pipe adapter. It does not reconstruct the figure through another raster renderer.
 
 The adapter loads the exact promoted self-contained HTML into an isolated `about:blank` page, waits for the fail-closed Figthread runtime and fonts, prepares either the semantic static-summary state or an exact event-sourced time frame, removes host-page padding/scaling only from the capture projection, applies the requested export-only background, and captures the exact promoted SVG surface.
 
@@ -156,6 +176,7 @@ npm run visual:promote -- skills/figthread/examples/minimal.figure.json skills/f
 npm run profile:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json
 npm run layout:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json
 npm run render:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json --out figure.svg --evidence evidence.json
+npm run visual:audit:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json --out visual-audit-evidence.json
 npm run motion:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json skills/figthread/examples/minimal.motion.json
 npm run document:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json skills/figthread/examples/minimal.motion.json --out figure.html
 npm run text:evidence:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json skills/figthread/examples/minimal.motion.json --out browser-text-evidence.json
@@ -166,6 +187,6 @@ npm run export:promote -- skills/figthread/examples/minimal.figure.json skills/f
 
 ## Determinism boundary
 
-Semantic, grammar, visual, profile, linear/radial layout, static SVG, motion, single-target document, multi-target package, HTML export, and vector-safe SVG export identities are content-addressed under their declared inputs. Browser text evidence additionally binds its browser/platform environment.
+Semantic, grammar, visual, profile, linear/radial layout, static SVG, motion, single-target document, multi-target package, HTML export, and vector-safe SVG export identities are content-addressed under their declared inputs. Browser visual audit and browser text evidence additionally bind their exact browser/platform environment.
 
 PNG is captured from exact promoted HTML and content-addressed after capture. Its guarantee is same-input/same-browser-font-environment visual determinism, not cross-platform byte identity. A multi-target package is deterministic because it embeds exact promoted child HTML bytes and hashes. Browser target switching is projection state only.
