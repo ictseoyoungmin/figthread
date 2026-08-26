@@ -1,7 +1,7 @@
 {
   "name": "figthread",
-  "version": "0.1.0",
-  "description": "Design, validate, and package semantic figures with deterministic explanatory motion.",
+  "version": "0.9.0",
+  "description": "Design, validate, package, and export semantic figures from promoted deterministic authority.",
   "author": {
     "name": "ictseoyoungmin",
     "url": "https://github.com/ictseoyoungmin"
@@ -9,6 +9,6 @@
   "homepage": "https://github.com/ictseoyoungmin/figthread",
   "repository": "https://github.com/ictseoyoungmin/figthread",
   "license": "MIT",
-  "keywords": ["figures", "visualization", "svg", "html", "motion", "documentation"],
+  "keywords": ["figures", "visualization", "svg", "html", "motion", "export", "documentation"],
   "skills": "./skills/"
 }
