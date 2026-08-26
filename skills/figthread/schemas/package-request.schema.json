@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://figthread.dev/schemas/package-request/0.1",
+  "title": "Figthread package request",
+  "type": "object",
+  "required": ["schema_version", "id", "targets"],
+  "properties": {
+    "schema_version": {"const": "figthread.package-request/0.1"},
+    "id": {"type": "string", "pattern": "^package:[a-z0-9][a-z0-9._-]*$"},
+    "default_target_id": {"type": "string", "minLength": 1},
+    "initial_mode": {"enum": ["interactive", "clean", "static"]},
+    "child_runtime_mode": {"enum": ["interactive", "clean", "static"]},
+    "targets": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["layout_target"],
+        "properties": {
+          "layout_target": {"type": "object"},
+          "runtime_mode": {"enum": ["interactive", "clean", "static"]},
+          "motion": {}
+        }
+      }
+    }
+  }
+}
