@@ -15,21 +15,13 @@ The implementation retains the ten promoted architecture slices closed through 1
 - **D-009** — content-addressed HTML/SVG export + browser-evidenced PNG capture contract
 - **D-010** — resumable run directory + immutable StageReceipt/checkpoint/reopen gate
 
-Version **1.0.1** added full fresh-worker benchmark dogfooding and repaired reopen revision reuse. Version **1.1.0** added actual Chrome-resolved glyph bounds and platform-font evidence. Version **1.2.0** adds multi-target document packaging without turning CSS scaling or runtime resize into canonical geometry.
+Version **1.0.1** added full fresh-worker benchmark dogfooding and repaired reopen revision reuse. Version **1.1.0** added actual Chrome-resolved glyph bounds and platform-font evidence. Version **1.2.0** added multi-target document packaging without turning CSS scaling or runtime resize into canonical geometry. Version **1.3.0** closes topology-specific deterministic radial layout for the registered radial grammar families.
 
-Topology-specific radial solving and a bundled PNG capture adapter remain outside the current runtime.
+A bundled PNG capture adapter remains outside the current runtime. Generic force-directed graph layout and automatic multi-ring radial packing also remain intentionally unsupported.
 
 ## Source of truth
 
 The installable skill under `skills/figthread/` is the runtime source of truth. Root `src/`, `schemas/`, `grammars/`, `profiles/`, `examples/`, `benchmarks/`, and `test/` are repository development mirrors and harnesses.
-
-Important multi-target files are:
-
-- `skills/figthread/runtime/document-package.js` — package authority, content hashing, embedded-child validation, and package runtime generation
-- `skills/figthread/scripts/package.mjs` — independently promotes every target before packaging
-- `skills/figthread/references/document-package.md` — agent-facing target/package authority protocol
-- `skills/figthread/schemas/document-package.schema.json` — package manifest contract
-- `skills/figthread/examples/minimal.package.json` — two-target package request
 
 ## Single-target promotion model
 
@@ -49,6 +41,21 @@ source / claims
 
 The browser text stage measures the exact promoted SVG with Chrome/Chromium and certifies glyph bounds, computed typography, font readiness, actual platform-font attribution, visibility, owner/viewport containment, and cross-owner label overlap. It is evidence only; it cannot repair copy or geometry.
 
+## Deterministic layout
+
+The base solver has three deterministic geometry modes: left-right, top-down, and topology-specific radial. No mode uses force-directed placement, randomness, browser auto-layout, or a hidden solver seed.
+
+Radial support is deliberately tied to grammar semantics rather than offered as a generic graph-layout switch:
+
+- `lifecycle` `cycle` / `ring`: one clockwise ring, starting at 12 o'clock in composition order;
+- `mechanism` `feedback-loop`: one clockwise ring preserving the causal cycle order;
+- `network` `radial`: the declared `hub` is fixed at the exact safe-area center and the remaining direct children form the ring;
+- `architecture` `hub-spoke`: the direct component with highest internal degree is the deterministic hub, with ties broken by composition order then ID.
+
+The radial solver preserves promoted intrinsic minimums and profile spacing floors. It searches a fixed preferred-to-minimum size sequence and a fixed set of ring rotations, computes a legal ring radius against the exact safe area, and rejects any candidate with minimum-gap collision. Unsupported radial grammar/variant combinations fail with `LAY009_RADIAL_TOPOLOGY`; supported topologies that cannot fit at minimum geometry fail with `LAY001_UNSAT`.
+
+Nested children inside a radial hub/ring node use local deterministic top-down packing. Relations are still routed orthogonally from promoted boxes, using deterministic anchor selection and obstacle/crossing/bend/length scoring.
+
 ## Multi-target packaging
 
 One target is never resized to impersonate another. Every target is promoted independently:
@@ -64,19 +71,9 @@ same semantic figure content
 
 The package runtime validates that every child is a real promoted document and that all child targets share the same semantic figure content apart from profile selection. Target-specific profile/layout/render/motion/document hashes remain independent.
 
-The package manifest binds:
+The package manifest binds semantic-content hash, deterministic target order/default selection, each target's profile and promoted viewport, child canonical/compile/build/HTML/promotion hashes, exact base64 child HTML bytes, runtime policy, and one content hash over the complete package manifest.
 
-- semantic-content hash;
-- deterministic target order and default target;
-- each target's profile and exact promoted viewport;
-- child canonical hash, compile key, build hash, HTML hash, and document promotion hash;
-- exact base64-encoded child HTML bytes;
-- package runtime policy;
-- one content hash over the complete package manifest.
-
-The browser surface exposes `window.FigthreadPackage` with `getStatus`, `listTargets`, `activateTarget`, `getActiveTarget`, and `getDiagnostics`.
-
-A child target is loaded at its exact promoted width and height into a scrollable frame. The parent package does **not** use `transform: scale(...)`. If a host viewport is smaller than a child target, the host scrolls it rather than silently changing certified geometry.
+The browser surface exposes `window.FigthreadPackage` with `getStatus`, `listTargets`, `activateTarget`, `getActiveTarget`, and `getDiagnostics`. A child target is loaded at its exact promoted width and height into a scrollable frame. The package does **not** use `transform: scale(...)` as layout.
 
 Run the bundled example:
 
@@ -88,10 +85,6 @@ npm run package:promote -- \
   skills/figthread/examples/minimal.motion.json \
   --out figure.package.html
 ```
-
-The package request can supply different target profiles. The CLI clones the base semantic figure only to select each target profile, then reruns semantic → grammar → visual → profile → layout → render → optional motion → document independently. A target may set `motion: null` when that profile intentionally has no explanatory motion.
-
-Package failures use `PKG001`–`PKG007`: invalid child authority, semantic drift, invalid target policy, duplicate target IDs, hash failure, external dependency, or runtime activation failure.
 
 ## Browser-resolved text evidence
 
@@ -152,10 +145,10 @@ npm run export:promote -- skills/figthread/examples/minimal.figure.json skills/f
 
 ## Determinism boundary
 
-Semantic, grammar, visual, profile, layout, static SVG, motion, single-target document, multi-target package, HTML export, and vector-safe SVG export identities are content-addressed under their declared inputs. Browser text evidence additionally binds its browser/platform environment.
+Semantic, grammar, visual, profile, linear/radial layout, static SVG, motion, single-target document, multi-target package, HTML export, and vector-safe SVG export identities are content-addressed under their declared inputs. Browser text evidence additionally binds its browser/platform environment.
 
 A multi-target package is deterministic because it embeds exact promoted child HTML bytes and hashes. Browser target switching is projection state only.
 
 ## Next bottleneck
 
-After multi-target packaging, the strongest remaining core-authoring limitation is **topology-specific radial layout solving**. The grammar registry already permits radial network intent, but the base layout solver deliberately fails closed instead of inventing unstable geometry. The next closure should add a deterministic radial solver with registered hub/ring order, explicit crossing policy, collision proof, and the same promotion/hash discipline as left-right and top-down layout.
+After topology-specific radial layout, the largest remaining delivery gap is a **bundled PNG capture adapter**. The export protocol already defines and validates PNG capture plans and evidence, but the installed runtime still requires an external conforming capture adapter. The next closure should launch the same controlled Chrome/Chromium environment used for browser evidence, prepare the promoted document at the exact semantic frame, capture exact target pixels, bind browser/font/environment evidence, validate PNG dimensions/chunks, and promote the resulting derivative without introducing a second layout or raster authority.
