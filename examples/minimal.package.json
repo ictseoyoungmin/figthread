@@ -23,7 +23,7 @@
         "target": {
           "id": "web-compact",
           "profile": "technical-explainer",
-          "viewport": {"width": 600, "height": 360},
+          "viewport": {"width": 720, "height": 360},
           "safe_area": {"top": 24, "right": 24, "bottom": 24, "left": 24}
         },
         "options": {"preferred_gap": 24, "min_gap": 18, "container_padding": 16, "routing_grid": 4, "obstacle_margin": 8, "max_crossings": 4}
