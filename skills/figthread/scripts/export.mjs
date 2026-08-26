@@ -45,9 +45,9 @@ if(![4,5].includes(positional.length)||!["draft","gate"].includes(mode)||(outInd
                   if(!documentPromotion.promoted){console.log(JSON.stringify({stage:"document",promoted:false,report:documentPromotion.report},null,2));process.exitCode=1;}
                   else{
                     const result=promote?await promoteExportArtifact(documentPromotion,renderPromotion,exportSpec):compileExport(documentPromotion,renderPromotion,exportSpec,{mode});
-                    const payload=promote?result.payload:result.payload;
+                    const payload=result.payload;
                     if(payload&&outIndex>=0)await writeFile(resolve(args[outIndex+1]),exportPayloadToBuffer(payload));
-                    const plan=promote?result.export_plan:result.export_plan;
+                    const plan=result.export_plan??result.report?.export_plan;
                     if(plan?.capture&&captureIndex>=0)await writeFile(resolve(args[captureIndex+1]),`${JSON.stringify(plan.capture,null,2)}\n`,"utf8");
                     const output={...result,payload:payload?{encoding:payload.encoding,data:outIndex>=0?`[written:${args[outIndex+1]}]`:`[${payload.encoding}:${exportPayloadToBuffer(payload).length} bytes]`}:undefined};
                     console.log(JSON.stringify(output,null,2));
