@@ -1,7 +1,7 @@
 {
   "name": "figthread",
-  "version": "0.9.0",
-  "description": "Design, validate, package, and export semantic figures from promoted deterministic authority.",
+  "version": "1.0.0",
+  "description": "Design, validate, package, export, and resume semantic figure work from promoted evidence-bound authority.",
   "author": {
     "name": "ictseoyoungmin",
     "url": "https://github.com/ictseoyoungmin"
@@ -9,6 +9,6 @@
   "homepage": "https://github.com/ictseoyoungmin/figthread",
   "repository": "https://github.com/ictseoyoungmin/figthread",
   "license": "MIT",
-  "keywords": ["figures", "visualization", "svg", "html", "motion", "export", "documentation"],
+  "keywords": ["figures", "visualization", "svg", "html", "motion", "export", "workflow", "documentation"],
   "skills": "./skills/"
 }
