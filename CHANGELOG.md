@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.9.0 — D-009 export closure
+
+- added ExportSpec validation for exact document/target/profile, format, frame, background, scale, and live-text policy
+- added deterministic ExportPlan identity bound to canonical/document/render/motion source hashes
+- added exact self-contained HTML derivative promotion
+- added vector-safe static-summary SVG export with deterministic background/outer-scale presentation changes and no geometry rewrite
+- made the default SVG export byte-identical to the promoted rendered SVG
+- added fail-closed vector eligibility checks for scripts, foreign objects, raster images, external references, and URL dependencies
+- added adapter-driven PNG capture contract over the promoted HTML runtime rather than a second raster renderer
+- added deterministic PNG capture plans with selector, frame, expected semantic state hash/local time, background, scale, and exact pixel dimensions
+- added PNG structure/chunk CRC/dimension verification plus runtime preparation, source authority, and browser/font/environment evidence binding
+- recorded exact-byte determinism for HTML/SVG and same-input/same-environment visual determinism for browser PNG without claiming cross-platform binary identity
+- added immutable ExportArtifact promotion receipts, export CLI, schema/template/example/root mirrors, agent-facing export reference, CI command, and regression coverage
+- extended the agent-facing boundary guard to ExportSpec, ExportPlan, and ExportArtifact labels
+
 ## 0.8.0 — D-008 self-contained document runtime
 
 - added a deterministic self-contained HTML document compiler over promoted semantic, grammar, visual, profile, layout, render, and optional motion authority
