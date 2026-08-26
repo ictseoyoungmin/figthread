@@ -1,8 +1,8 @@
 {
   "name": "figthread",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "private": true,
-  "description": "Semantic figure authoring with promoted grammar, visual, profile, deterministic linear and topology-specific radial layout, rendering, browser-resolved text evidence, motion, self-contained HTML, multi-target packaging, browser-captured PNG/content-addressed export, and resumable evidence-bound execution.",
+  "description": "Semantic figure authoring with promoted grammar, visual, profile, deterministic linear and topology-specific radial layout, rendering, browser-resolved text evidence, full-SVG visual audit, motion, self-contained HTML, multi-target packaging, browser-captured PNG/content-addressed export, and resumable evidence-bound execution.",
   "type": "module",
   "scripts": {
     "test": "node --test",
@@ -19,6 +19,8 @@
     "layout:promote": "node skills/figthread/scripts/layout.mjs --promote",
     "render": "node skills/figthread/scripts/render.mjs",
     "render:promote": "node skills/figthread/scripts/render.mjs --promote",
+    "visual:audit": "node skills/figthread/scripts/visual-audit.mjs",
+    "visual:audit:promote": "node skills/figthread/scripts/visual-audit.mjs --promote",
     "text:evidence": "node skills/figthread/scripts/browser-text.mjs",
     "text:evidence:promote": "node skills/figthread/scripts/browser-text.mjs --promote",
     "motion": "node skills/figthread/scripts/motion.mjs",
