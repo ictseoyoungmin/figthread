@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://figthread.dev/schemas/checkpoint/0.1",
+  "title": "Figthread execution checkpoint",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "run_id", "sequence", "reason", "frontier_stage", "active_receipts", "revisions", "previous_checkpoint_hash", "checkpoint_hash"],
+  "properties": {
+    "schema_version": {"const": "figthread.checkpoint/0.1"},
+    "run_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+    "sequence": {"type": "integer", "minimum": 1},
+    "reason": {"type": "string", "minLength": 1},
+    "frontier_stage": {},
+    "active_receipts": {"type": "object"},
+    "revisions": {"type": "object"},
+    "previous_checkpoint_hash": {},
+    "checkpoint_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}
