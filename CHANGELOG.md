@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.0.0 — D-010 workspace / execution closure
+
+- added a durable run-directory protocol that treats filesystem state as external memory for long-running figure work
+- added exact intake source provenance, a content-hashed mutable run manifest, nine fixed execution stages, and one explicit active frontier
+- added immutable content-addressed StageReceipt records that bind source, predecessor, exact artifact bytes, exact evidence bytes, and optional promoted authority hashes
+- added content-hashed checkpoints after initialization, promotion, and reopen, with previous-checkpoint chaining and active receipt/revision/frontier snapshots
+- added fresh-worker resume that verifies source, receipt chain, artifact/evidence bytes, and checkpoint state without conversation history
+- added earliest-invalid-stage detection for tampered or missing promoted artifacts/evidence
+- added revisioned reopen that preserves history and automatically invalidates every active descendant of the causal stage
+- made changed intake provenance or an invalid run manifest fatal rather than allowing reopen to hide provenance damage
+- added exclusive single-writer locking plus explicit audit-recorded stale-lock recovery
+- added path containment and active-revision ownership rules, with `final/` allowed only for bound export-stage deliverables
+- added `EXE001`–`EXE010` diagnostics, skill-local workspace CLI, agent-facing execution reference, runtime/root schema mirrors, and regression/CLI coverage
+- moved the release to 1.0.0 while keeping installed skill prose free of roadmap codes and public contract-version labels
+
 ## 0.9.0 — D-009 export closure
 
 - added ExportSpec validation for exact document/target/profile, format, frame, background, scale, and live-text policy
