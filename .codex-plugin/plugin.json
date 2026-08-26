@@ -1,7 +1,7 @@
 {
   "name": "figthread",
-  "version": "1.1.0",
-  "description": "Design, validate, browser-review, package, export, and resume semantic figure work from promoted evidence-bound authority.",
+  "version": "1.2.0",
+  "description": "Design, validate, browser-review, multi-target package, export, and resume semantic figure work from promoted evidence-bound authority.",
   "author": {
     "name": "ictseoyoungmin",
     "url": "https://github.com/ictseoyoungmin"
@@ -12,15 +12,15 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Figthread",
-    "shortDescription": "Author figures with browser-certified text evidence",
-    "longDescription": "A semantic figure authoring skill that turns claims into promoted semantic, grammar, visual, profile, layout, and rendering authority, certifies browser-resolved text bounds and platform fonts, compiles semantic motion, packages self-contained HTML, exports content-addressed derivatives, and supports resumable evidence-bound execution.",
+    "shortDescription": "Author browser-certified multi-target semantic figures",
+    "longDescription": "A semantic figure authoring skill that turns claims into promoted semantic, grammar, visual, profile, layout, and rendering authority, certifies browser-resolved text bounds and platform fonts, compiles semantic motion, packages independently promoted targets into self-contained HTML, exports content-addressed derivatives, and supports resumable evidence-bound execution.",
     "developerName": "ictseoyoungmin",
     "category": "Developer Tools",
-    "capabilities": ["Instructions", "Visualization", "Validation", "Browser Evidence", "Motion", "Export", "Workflow"],
+    "capabilities": ["Instructions", "Visualization", "Validation", "Browser Evidence", "Motion", "Multi-target Packaging", "Export", "Workflow"],
     "websiteURL": "https://github.com/ictseoyoungmin/figthread",
     "defaultPrompt": [
       "Use Figthread for this explanatory figure.",
-      "Turn this claim into a publication-ready semantic figure and certify its browser-resolved text bounds and platform fonts.",
+      "Turn this claim into independently promoted desktop and compact target figures and package them together.",
       "Resume and validate this figure from its Figthread run directory."
     ],
     "brandColor": "#B5523A",
