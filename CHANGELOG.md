@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.3.0 — deterministic topology-specific radial layout
+
+- added a deterministic radial solver without force-directed placement, randomness, browser auto-layout, or hidden solver seeds
+- added one-ring clockwise lifecycle and feedback-loop placement that preserves composition order from 12 o'clock
+- added explicit-hub radial network placement with the hub fixed at the exact target safe-area center
+- added deterministic architecture hub-spoke inference by grammar-internal degree with composition-order and stable-ID tie breaks
+- added fixed preferred-to-minimum footprint search, deterministic ring rotation candidates, safe-area radius bounds, and hard minimum-gap collision rejection
+- kept nested radial descendants deterministic with local top-down packing and kept all final geometry inside `ResolvedLayout`
+- extended orthogonal routing for radial geometry with four-side anchor selection and deterministic elbow/perimeter candidates
+- added `LAY009_RADIAL_TOPOLOGY` for radial grammar/variant combinations without a registered deterministic topology solver
+- retained fail-closed `LAY001_UNSAT` behavior when a supported radial topology cannot fit promoted minimum geometry
+- added full-chain radial lifecycle/network promotion coverage plus architecture, feedback-loop, deterministic hashing, collision, routing, and tight-viewport regression coverage
+- updated installed layout guidance and bumped package/skill/plugin metadata to 1.3.0
+
 ## 1.2.0 — multi-target document packaging
 
 - added a content-addressed `DocumentPackage` that embeds two or more exact independently promoted child HTML documents in one self-contained delivery
