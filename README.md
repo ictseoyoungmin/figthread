@@ -1,6 +1,6 @@
 # Figthread
 
-Figthread is a semantic figure authoring system whose canonical delivery surface is a self-contained HTML document with deterministic static SVG, browser-resolved typography evidence, and optional semantic motion.
+Figthread is a semantic figure authoring system whose canonical delivery surfaces are exact self-contained HTML documents and, when needed, one self-contained multi-target package made from independently promoted child documents.
 
 The implementation retains the ten promoted architecture slices closed through 1.0.x:
 
@@ -12,66 +12,90 @@ The implementation retains the ten promoted architecture slices closed through 1
 - **D-006** — deterministic static SVG renderer + rendered-profile evidence gate
 - **D-007** — canonical figure grammar registry + GrammarPlan gate
 - **D-008** — self-contained FigthreadDocument + fail-closed browser runtime gate
-- **D-009** — content-addressed HTML/SVG export + browser-evidenced PNG capture gate
+- **D-009** — content-addressed HTML/SVG export + browser-evidenced PNG capture contract
 - **D-010** — resumable run directory + immutable StageReceipt/checkpoint/reopen gate
 
-Version **1.0.1** added the first full fresh-worker benchmark dogfood and repaired downstream revision reuse exposed by that run. Version **1.1.0** closes the next quality gap: actual browser-shaped glyph bounds and platform-font identity are now independently certified against the exact promoted SVG/document authority.
+Version **1.0.1** added full fresh-worker benchmark dogfooding and repaired reopen revision reuse. Version **1.1.0** added actual Chrome-resolved glyph bounds and platform-font evidence. Version **1.2.0** adds multi-target document packaging without turning CSS scaling or runtime resize into canonical geometry.
 
-Topology-specific radial solving, multi-target document packaging, and a bundled PNG capture adapter remain outside the current runtime.
+Topology-specific radial solving and a bundled PNG capture adapter remain outside the current runtime.
 
 ## Source of truth
 
-The installable skill under `skills/figthread/` is the runtime source of truth. Root `src/`, `schemas/`, `grammars/`, `profiles/`, `examples/`, `benchmarks/`, and `test/` are repository development mirrors and harnesses, not a second runtime implementation.
+The installable skill under `skills/figthread/` is the runtime source of truth. Root `src/`, `schemas/`, `grammars/`, `profiles/`, `examples/`, `benchmarks/`, and `test/` are repository development mirrors and harnesses.
 
-Important browser text evidence files are:
+Important multi-target files are:
 
-- `skills/figthread/runtime/browser-text.js` — deterministic plan/evidence validation plus zero-dependency Chrome/Chromium DevTools adapter
-- `skills/figthread/scripts/browser-text.mjs` — full-chain browser text evidence CLI
-- `skills/figthread/references/browser-text-evidence.md` — agent-facing authority and recovery protocol
-- `skills/figthread/schemas/browser-text-evidence.schema.json` — promoted evidence contract
+- `skills/figthread/runtime/document-package.js` — package authority, content hashing, embedded-child validation, and package runtime generation
+- `skills/figthread/scripts/package.mjs` — independently promotes every target before packaging
+- `skills/figthread/references/document-package.md` — agent-facing target/package authority protocol
+- `skills/figthread/schemas/document-package.schema.json` — package manifest contract
+- `skills/figthread/examples/minimal.package.json` — two-target package request
 
-Execution remains owned by `skills/figthread/runtime/execution.js` and `skills/figthread/scripts/workspace.mjs`.
-
-## Promotion and execution model
+## Single-target promotion model
 
 ```text
-source bytes
-  -> run workspace
-  -> understanding receipt
-  -> claims receipt
-  -> FigureSpec / semantic promotion
-  -> grammar + visual promotion
-  -> profile + layout + exact static render
-  -> optional semantic motion promotion
-  -> self-contained document promotion
+source / claims
+  -> FigureSpec
+  -> GrammarPlan + PrimitivePlan
+  -> ProfilePlan
+  -> ResolvedLayout
+  -> promoted static SVG
+  -> optional MotionProgram
+  -> self-contained FigthreadDocument
   -> browser-resolved text evidence
-  -> exact artifact review
-  -> export promotion
-  -> completed run
+  -> review
+  -> export
 ```
 
-Browser text evidence does not become a second layout engine. It binds the exact promoted document, SVG, render, layout, profile threshold, target, semantic labels, and owner boxes into a deterministic BrowserTextPlan. A real Chrome/Chromium process then returns an environment-bound observation. Only validation of that observation produces promoted BrowserTextEvidence.
+The browser text stage measures the exact promoted SVG with Chrome/Chromium and certifies glyph bounds, computed typography, font readiness, actual platform-font attribution, visibility, owner/viewport containment, and cross-owner label overlap. It is evidence only; it cannot repair copy or geometry.
 
-The evidence layer can reject geometry or copy, but it cannot repair either one.
+## Multi-target packaging
+
+One target is never resized to impersonate another. Every target is promoted independently:
+
+```text
+same semantic figure content
+  ├─ target A profile -> layout A -> render A -> motion A -> document A
+  ├─ target B profile -> layout B -> render B -> motion B -> document B
+  └─ target C profile -> layout C -> render C -> motion C -> document C
+                                      ↓
+                              DocumentPackage
+```
+
+The package runtime validates that every child is a real promoted document and that all child targets share the same semantic figure content apart from profile selection. Target-specific profile/layout/render/motion/document hashes remain independent.
+
+The package manifest binds:
+
+- semantic-content hash;
+- deterministic target order and default target;
+- each target's profile and exact promoted viewport;
+- child canonical hash, compile key, build hash, HTML hash, and document promotion hash;
+- exact base64-encoded child HTML bytes;
+- package runtime policy;
+- one content hash over the complete package manifest.
+
+The browser surface exposes `window.FigthreadPackage` with `getStatus`, `listTargets`, `activateTarget`, `getActiveTarget`, and `getDiagnostics`.
+
+A child target is loaded at its exact promoted width and height into a scrollable frame. The parent package does **not** use `transform: scale(...)`. If a host viewport is smaller than a child target, the host scrolls it rather than silently changing certified geometry.
+
+Run the bundled example:
+
+```bash
+npm run package:promote -- \
+  skills/figthread/examples/minimal.figure.json \
+  skills/figthread/examples/minimal.visual.json \
+  skills/figthread/examples/minimal.package.json \
+  skills/figthread/examples/minimal.motion.json \
+  --out figure.package.html
+```
+
+The package request can supply different target profiles. The CLI clones the base semantic figure only to select each target profile, then reruns semantic → grammar → visual → profile → layout → render → optional motion → document independently. A target may set `motion: null` when that profile intentionally has no explanatory motion.
+
+Package failures use `PKG001`–`PKG007`: invalid child authority, semantic drift, invalid target policy, duplicate target IDs, hash failure, external dependency, or runtime activation failure.
 
 ## Browser-resolved text evidence
 
-The static renderer already certifies explicit SVG font size, stroke, contrast, grayscale, coverage, and purity. It intentionally keeps its own `browser_text_extent_certified` metric false because serialized markup cannot prove browser shaping.
-
-The browser evidence stage closes that gap by measuring every primary label with the exact promoted SVG bytes in an isolated `about:blank` measurement harness. It records:
-
-- semantic owner, role, and exact rendered text;
-- computed font size, family stack, weight, visibility, and opacity;
-- SVG `getBBox()` glyph bounds and browser-space bounds;
-- `document.fonts` loading/availability state;
-- actual platform font families and glyph counts from Chrome DevTools `CSS.getPlatformFontsForNode`;
-- browser product/revision, DevTools protocol, JavaScript version, user agent, platform, language, and device-pixel ratio.
-
-There is no Puppeteer or Playwright dependency and no localhost/file-navigation requirement. Chrome is launched with `--remote-debugging-pipe`; the measurement harness is installed directly in an isolated blank target and discarded afterward.
-
-Promotion fails on authority/hash mismatch, source text drift, missing or duplicate labels, font-size floor violation, unresolved platform fonts, empty glyph bounds, owner-box overflow, viewport overflow, cross-owner label overlap, hidden text, incomplete environment identity, or tampered observation/evidence hashes. Diagnostics use `TXT001` through `TXT010`.
-
-Run it directly:
+The serialized SVG renderer keeps its own `browser_text_extent_certified` metric false because markup alone cannot prove browser shaping. The browser evidence layer closes that proof gap with a zero-dependency Chrome/Chromium DevTools-pipe adapter.
 
 ```bash
 npm run text:evidence:promote -- \
@@ -83,19 +107,13 @@ npm run text:evidence:promote -- \
   --observation-out browser-text-observation.json
 ```
 
-The browser executable is resolved from `FIGTHREAD_CHROME`, `--browser`, or common Chrome/Chromium names and installation paths. Absence of a supported browser is a hard evidence failure, not permission to substitute estimated text metrics.
-
-A successful promotion records `browser_text_extent_certified: true` and `platform_font_identity_certified: true` for the captured environment. The latter is explicitly environment-specific; Figthread does not claim that every operating system resolves the same font.
+The evidence is environment-specific. Figthread does not claim that every OS resolves the same platform font or screenshot bytes.
 
 ## Full benchmark dogfood
 
-`benchmarks/e2e-dogfood/` drives the actual runtime through the complete long-running workflow rather than testing validators in isolation.
+`benchmarks/e2e-dogfood/` drives the actual runtime through source understanding, claims, semantic promotion, grammar/visual, profile/layout/render, process handoff, motion, document, exact review, causal reopen, descendant regeneration, export, and completion verification.
 
-The benchmark source requires the terminal pipeline node to be named **Delivered Result**. The first semantic revision deliberately uses **Output**. That revision passes core semantic/grammar/visual/layout/render gates, but exact artifact review finds the source-fidelity defect. The run reopens `figure-ir`, advances every affected started stage to a new revision, regenerates descendants, reviews again, exports, and completes.
-
-Worker A and Worker B are separate Node processes. Worker B reconstructs promoted authority from the run directory instead of process memory or conversation history.
-
-Run it with:
+The benchmark intentionally lets an early wording defect pass core structural gates so exact artifact review must reopen `figure-ir` rather than patch the downstream SVG/HTML. Worker A and Worker B are separate Node processes; Worker B reconstructs authority from run-directory state rather than chat or process memory.
 
 ```bash
 npm run benchmark:dogfood
@@ -114,8 +132,6 @@ npm run workspace -- checkpoint ./runs/run-... --reason "handoff"
 npm run workspace -- recover-lock ./runs/run-... --reason "confirmed crashed worker"
 ```
 
-The installed skill uses `node <skill-root>/scripts/workspace.mjs ...`; repository npm commands are developer conveniences.
-
 ## Figure pipeline commands
 
 ```bash
@@ -130,15 +146,16 @@ npm run render:promote -- skills/figthread/examples/minimal.figure.json skills/f
 npm run motion:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json skills/figthread/examples/minimal.motion.json
 npm run document:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json skills/figthread/examples/minimal.motion.json --out figure.html
 npm run text:evidence:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json skills/figthread/examples/minimal.motion.json --out browser-text-evidence.json
+npm run package:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.package.json skills/figthread/examples/minimal.motion.json --out figure.package.html
 npm run export:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json skills/figthread/examples/minimal.motion.json skills/figthread/examples/minimal.export.json --out figure.svg
 ```
 
 ## Determinism boundary
 
-Semantic, grammar, visual, profile, layout, static SVG, motion, document, HTML export, and vector-safe SVG export identities are content-addressed under their declared engine inputs. Browser text evidence additionally binds the browser/platform environment because font selection and glyph shaping are environment-sensitive facts.
+Semantic, grammar, visual, profile, layout, static SVG, motion, single-target document, multi-target package, HTML export, and vector-safe SVG export identities are content-addressed under their declared inputs. Browser text evidence additionally binds its browser/platform environment.
 
-The browser is an observer, never canonical geometry authority.
+A multi-target package is deterministic because it embeds exact promoted child HTML bytes and hashes. Browser target switching is projection state only.
 
 ## Next bottleneck
 
-After browser-resolved typography proof, the next architecture bottleneck is **multi-target packaging**. The current document compiler embeds exactly one promoted target. A robust next step should compile multiple independently promoted target/layout/render branches into one document package without treating CSS scaling or runtime viewport changes as canonical geometry.
+After multi-target packaging, the strongest remaining core-authoring limitation is **topology-specific radial layout solving**. The grammar registry already permits radial network intent, but the base layout solver deliberately fails closed instead of inventing unstable geometry. The next closure should add a deterministic radial solver with registered hub/ring order, explicit crossing policy, collision proof, and the same promotion/hash discipline as left-right and top-down layout.
