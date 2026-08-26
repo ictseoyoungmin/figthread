@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.2.0 — multi-target document packaging
+
+- added a content-addressed `DocumentPackage` that embeds two or more exact independently promoted child HTML documents in one self-contained delivery
+- made semantic equivalence across child targets explicit while allowing target-specific profile selection, layout, rendering, and motion decisions
+- added fail-closed package diagnostics for child authority tampering, semantic drift, invalid/duplicate targets, manifest/hash failure, external dependencies, and runtime activation failure
+- added a browser package runtime with exact target switching through `window.FigthreadPackage`
+- made each child frame use its promoted viewport dimensions and explicitly prohibited CSS transform scaling as a substitute for target-specific layout
+- added a full-chain package CLI that reruns semantic → grammar → visual → profile → layout → render → optional motion → document independently for every target
+- added multi-target package manifest schema, root/runtime mirrors, package request example, agent-facing reference, and regression/CLI coverage
+- added Node 20/22 CI promotion for the multi-target package example
+- extended agent-facing boundary guards to package contract names and bumped package/skill/plugin metadata to 1.2.0
+
 ## 1.1.0 — browser-resolved text evidence
 
 - added deterministic BrowserTextPlan identity bound to the exact promoted document, rendered SVG, layout, profile threshold, target viewport, semantic labels, and owner boxes

@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://figthread.dev/schemas/document-package/0.1",
+  "title": "Figthread document package",
+  "type": "object",
+  "required": ["schema_version", "package_id", "semantic_hash", "default_target_id", "target_order", "targets", "runtime", "package_hash"],
+  "properties": {
+    "schema_version": {"const": "figthread.document-package/0.1"},
+    "package_id": {"type": "string", "pattern": "^package:[a-z0-9][a-z0-9._-]*$"},
+    "semantic_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "default_target_id": {"type": "string", "minLength": 1},
+    "target_order": {"type": "array", "minItems": 2, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "targets": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["target_id", "profile", "viewport", "document_id", "canonical_hash", "compile_key", "build_hash", "html_hash", "document_promotion_hash", "html_base64"],
+        "properties": {
+          "target_id": {"type": "string", "minLength": 1},
+          "profile": {"type": "string", "minLength": 1},
+          "viewport": {"type": "object", "required": ["width", "height"], "properties": {"width": {"type": "number", "exclusiveMinimum": 0}, "height": {"type": "number", "exclusiveMinimum": 0}}},
+          "document_id": {"type": "string", "minLength": 1},
+          "canonical_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+          "compile_key": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+          "build_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+          "html_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+          "document_promotion_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+          "html_base64": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "required": ["initial_mode", "allowed_modes", "target_switching", "css_geometry_scaling"],
+      "properties": {
+        "initial_mode": {"enum": ["interactive", "clean", "static"]},
+        "allowed_modes": {"type": "array", "items": {"enum": ["interactive", "clean", "static"]}},
+        "target_switching": {"const": "exact-promoted-document"},
+        "css_geometry_scaling": {"const": false}
+      }
+    },
+    "package_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

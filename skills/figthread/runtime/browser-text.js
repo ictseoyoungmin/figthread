@@ -278,6 +278,6 @@ export async function captureBrowserTextObservation(documentPromotion, renderPro
     throw Object.assign(new Error(`${error.message}${error?.code ? ` (${error.code})` : ""}`), { code: error?.code ?? "TXT007_ENVIRONMENT" });
   } finally {
     if (child && !child.killed) { const exited = once(child, "exit").catch(() => []); child.kill("SIGKILL"); await Promise.race([exited, delay(1000)]); }
-    await rm(profileDir, { recursive: true, force: true });
+    await rm(profileDir, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
   }
 }

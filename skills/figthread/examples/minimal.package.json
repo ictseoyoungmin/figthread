@@ -1,0 +1,33 @@
+{
+  "schema_version": "figthread.package-request/0.1",
+  "id": "package:minimal-responsive",
+  "default_target_id": "web-wide",
+  "initial_mode": "interactive",
+  "child_runtime_mode": "interactive",
+  "targets": [
+    {
+      "layout_target": {
+        "schema_version": "figthread.layout-target/0.1",
+        "target": {
+          "id": "web-wide",
+          "profile": "technical-explainer",
+          "viewport": {"width": 800, "height": 300},
+          "safe_area": {"top": 20, "right": 20, "bottom": 20, "left": 20}
+        },
+        "options": {"preferred_gap": 32, "min_gap": 18, "container_padding": 16, "routing_grid": 4, "obstacle_margin": 8, "max_crossings": 4}
+      }
+    },
+    {
+      "layout_target": {
+        "schema_version": "figthread.layout-target/0.1",
+        "target": {
+          "id": "web-compact",
+          "profile": "technical-explainer",
+          "viewport": {"width": 720, "height": 360},
+          "safe_area": {"top": 24, "right": 24, "bottom": 24, "left": 24}
+        },
+        "options": {"preferred_gap": 24, "min_gap": 18, "container_padding": 16, "routing_grid": 4, "obstacle_margin": 8, "max_crossings": 4}
+      }
+    }
+  ]
+}
