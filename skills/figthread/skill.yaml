@@ -1,11 +1,11 @@
 schema: hadara.skill/v0.1
 name: figthread
-version: 0.6.0
+version: 0.7.0
 description: >-
   Design and validate semantic figures through promoted semantic state,
-  primitive-bound visual structure, profile-strengthened readability,
-  deterministic layout geometry, deterministic SVG rendering evidence,
-  and deterministic semantic motion.
+  canonical figure grammar, primitive-bound visual structure,
+  profile-strengthened readability, deterministic layout geometry,
+  deterministic SVG rendering evidence, and deterministic semantic motion.
 entry:
   skill: SKILL.md
 resources:
@@ -13,6 +13,7 @@ resources:
   references: references/
   assets: assets/
   schemas: schemas/
+  grammars: grammars/
   primitives: primitives/
   profiles: profiles/
   runtime: runtime/
@@ -23,9 +24,9 @@ compatibility:
   os: [windows, linux, macos]
 interface:
   display_name: "Figthread"
-  short_description: "Author profile-aware semantic figures with deterministic SVG output"
+  short_description: "Author grammar-bound semantic figures with deterministic SVG output"
   icon_small: "./assets/icon.svg"
   icon_large: "./assets/icon.svg"
-  default_prompt: "Use $figthread to author and validate semantic figure state, bind it to explanatory primitives, strengthen it with the target profile, resolve deterministic layout geometry, render and audit the static SVG, and add semantic motion only when motion adds meaning."
+  default_prompt: "Use $figthread to author and validate semantic figure state, promote one canonical figure grammar, bind it to explanatory primitives, strengthen it with the target profile, resolve deterministic layout geometry, render and audit the static SVG, and add semantic motion only when motion adds meaning."
 policy:
   allow_implicit_invocation: true
