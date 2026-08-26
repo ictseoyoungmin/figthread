@@ -19,7 +19,7 @@ Targets may use different profiles. The package verifies that their semantic fig
 
 ## Building a package
 
-Author a package request containing at least two inline `layout_target` entries. The base FigureSpec supplies semantic content. For each target, the package CLI selects the target profile, reruns the complete promotion chain, and creates an independently promoted self-contained document.
+Author a package request that satisfies `schemas/package-request.schema.json` and contains at least two inline `layout_target` entries. The base FigureSpec supplies semantic content. For each target, the package CLI selects the target profile, reruns the complete promotion chain, and creates an independently promoted self-contained document.
 
 ```bash
 node <skill-root>/scripts/package.mjs \
@@ -33,11 +33,11 @@ node <skill-root>/scripts/package.mjs \
 
 A target entry may set `motion` explicitly. When omitted, the optional global MotionSpec is used. Set `motion` to `null` for a target whose profile intentionally has no explanatory motion. A motion-enabled target still has to satisfy that target profile's motion envelope.
 
-The request chooses a stable package ID, default target, package runtime mode, and child runtime mode. Target IDs must be unique.
+The request chooses a stable package ID, default target, package runtime mode, and child runtime mode. Target IDs must be unique. The installed example is `examples/minimal.package.json`.
 
 ## Package identity
 
-The package manifest binds:
+The promoted manifest satisfies `schemas/document-package.schema.json` and binds:
 
 - one semantic-content hash shared by every child target;
 - ordered target IDs;
