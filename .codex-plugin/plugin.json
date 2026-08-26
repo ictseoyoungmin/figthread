@@ -1,7 +1,7 @@
 {
   "name": "figthread",
-  "version": "0.9.0",
-  "description": "Design, validate, package, and export semantic figures from promoted deterministic authority.",
+  "version": "1.0.0",
+  "description": "Design, validate, package, export, and resume semantic figure work from promoted evidence-bound authority.",
   "author": {
     "name": "ictseoyoungmin",
     "url": "https://github.com/ictseoyoungmin"
@@ -12,16 +12,16 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Figthread",
-    "shortDescription": "Author and export deterministic semantic figures",
-    "longDescription": "A semantic figure authoring skill that turns claims into validated semantic state, promoted grammar and visual authority, deterministic layout/rendering, semantic motion, self-contained HTML, and content-addressed delivery derivatives.",
+    "shortDescription": "Author semantic figures with resumable evidence",
+    "longDescription": "A semantic figure authoring skill that turns claims into validated semantic state, promoted grammar and visual authority, deterministic layout/rendering, semantic motion, self-contained HTML, content-addressed delivery derivatives, and resumable evidence-bound execution workspaces.",
     "developerName": "ictseoyoungmin",
     "category": "Developer Tools",
-    "capabilities": ["Instructions", "Visualization", "Validation", "Motion", "Export"],
+    "capabilities": ["Instructions", "Visualization", "Validation", "Motion", "Export", "Workflow"],
     "websiteURL": "https://github.com/ictseoyoungmin/figthread",
     "defaultPrompt": [
       "Use Figthread for this explanatory figure.",
       "Turn this claim into a publication-ready semantic figure.",
-      "Validate and export this figure from promoted authority."
+      "Resume and validate this figure from its Figthread run directory."
     ],
     "brandColor": "#B5523A",
     "composerIcon": "./skills/figthread/assets/icon.svg",

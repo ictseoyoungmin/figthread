@@ -1,8 +1,8 @@
 {
   "name": "figthread",
-  "version": "0.9.0",
+  "version": "1.0.0",
   "private": true,
-  "description": "Semantic figure authoring with promoted grammar, visual, profile, layout, deterministic SVG rendering, self-contained HTML runtime composition, semantic motion, and content-addressed export.",
+  "description": "Semantic figure authoring with promoted grammar, visual, profile, layout, rendering, motion, self-contained HTML, content-addressed export, and resumable evidence-bound execution.",
   "type": "module",
   "scripts": {
     "test": "node --test",
@@ -23,7 +23,8 @@
     "document": "node skills/figthread/scripts/document.mjs",
     "document:promote": "node skills/figthread/scripts/document.mjs --promote",
     "export": "node skills/figthread/scripts/export.mjs",
-    "export:promote": "node skills/figthread/scripts/export.mjs --promote"
+    "export:promote": "node skills/figthread/scripts/export.mjs --promote",
+    "workspace": "node skills/figthread/scripts/workspace.mjs"
   },
   "engines": {"node": ">=20"},
   "license": "MIT"

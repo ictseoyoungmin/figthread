@@ -14,6 +14,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - run: npm test
+      - run: npm run workspace -- stages
       - run: npm run validate -- skills/figthread/examples/minimal.figure.json
       - run: npm run validate:promote -- skills/figthread/examples/minimal.figure.json
       - run: npm run grammar -- skills/figthread/examples/minimal.figure.json
