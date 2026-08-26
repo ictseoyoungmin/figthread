@@ -1,14 +1,14 @@
 ---
 name: figthread
 description: >-
-  Design and validate publication-ready semantic figures from claims, papers,
-  data, or system concepts. Use when the reader must follow a clear visual
-  thread; do not use for decorative graphics without an explanatory claim.
+  Design and validate high-fidelity semantic figures from claims, data,
+  references, or system concepts. Use when the reader must follow a clear
+  visual thread; do not use for decorative graphics without an explanatory claim.
 ---
 
 # Figthread
 
-Figure first, motion second. Meaning, grammar, visual binding, readability constraints, geometry, static rendering, browser text evidence, motion, single-target documents, multi-target packaging, export, and execution evidence have separate authorities. Never let a downstream stage silently repair or replace an upstream authority.
+Figure first, motion second. Meaning, grammar, visual binding, readability constraints, geometry, static rendering, browser visual audit, browser text evidence, motion, single-target documents, multi-target packaging, export, and execution evidence have separate authorities. Never let a downstream stage silently repair or replace an upstream authority.
 
 For work that spans multiple stages, may be interrupted, or must survive worker handoff, use the execution workspace as external memory. Conversation history, screenshots, and path existence are not completion proof.
 
@@ -25,6 +25,8 @@ Before visual binding, also read `references/visual-primitives.md`, `schemas/vis
 Before profile/target resolution, also read `references/profile-thresholds.md`, `profiles/registry.json`, `schemas/layout-target.schema.json`, and `templates/layout-target.json`.
 
 Before deterministic layout, read `references/layout-resolution.md`. Before static rendering, read `references/rendering.md`.
+
+Before browser-resolved spatial review, read `references/visual-audit.md` and `schemas/visual-audit-evidence.schema.json`.
 
 When motion adds explanatory value, read `references/motion-ir.md`, `schemas/motion-spec.schema.json`, and `templates/motion-spec.json`.
 
@@ -74,15 +76,35 @@ Profile: choose an explicit target viewport/profile/safe area/options, gate with
 
 Layout: run `layout.mjs` from matching promoted semantic/grammar/visual/profile artifacts. Left-right and top-down layouts are deterministic linear solves; registered radial lifecycle, feedback-loop, network, and hub-spoke layouts use deterministic topology-specific ring/hub solving. Treat only `ResolvedLayout` as actual box, anchor, and connector geometry authority. Never patch renderer CSS to hide a layout failure.
 
-Static rendering: run `render.mjs`, repair `RND` failures at their semantic/primitive/profile/layout owner, and treat only promoted `rendered_svg` as the certified static derivative. Serialized render evidence does not by itself certify browser-shaped glyph extents or platform-font identity.
+Static rendering: run `render.mjs`, repair `RND` failures at their semantic/primitive/profile/layout owner, and treat only promoted `rendered_svg` as the certified static derivative. Serialized render evidence does not by itself certify browser-shaped glyph extents, custom internal element containment/collision, or platform-font identity.
+
+Browser visual audit: run `visual-audit.mjs` from the matching promoted figure/visual/layout/render authorities. Every primary label and every custom `<text>` is measured; classified custom geometry and promoted relation connectors are measured in the same browser coordinate system. Repair `AUD` failures by reopening the causal semantic, visual, profile, layout, or environment decision. The audit is evidence only and cannot edit geometry.
 
 Motion: use only when sequence, transfer, propagation, state change, accumulation, routing, or comparison becomes clearer. Author semantic beats/effects/cues in `MotionSpec`; do not author resolved coordinates, SVG paths, CSS keyframes, or callbacks. Gate with `motion.mjs` and treat only `MotionProgram` as executable motion authority. Seeking is event-sourced from initial semantic state.
 
-Single-target document: after semantic, grammar, primitive, profile, layout, rendering, and optional motion promotion, run `document.mjs`. Treat runtime mode as ephemeral view state; DOM/CSS state is never semantic or geometry authority.
+Single-target document: after semantic, grammar, primitive, profile, layout, rendering, browser visual audit, and optional motion promotion, run `document.mjs`. Treat runtime mode as ephemeral view state; DOM/CSS state is never semantic or geometry authority.
+
+## Browser visual audit and promotion
+
+Run the browser visual audit after static rendering and before visual review is considered complete:
+
+```bash
+node <skill-root>/scripts/visual-audit.mjs \
+  <figure-spec.json> <visual-spec.json> <layout-target.json> \
+  --mode gate
+```
+
+The bundled adapter launches Chrome or Chromium through the DevTools pipe, injects the exact promoted static SVG into an isolated fixed-size harness, waits for fonts, and measures browser-resolved geometry in root SVG coordinates. It performs no public-network navigation and does not use Puppeteer or Playwright.
+
+Custom primitive `<text>` is always audited. Visible custom geometry should declare `data-figthread-audit="container|essential|connector|decorative"`. If the attribute is absent, `data-essential="true"` is treated as `essential`; otherwise unclassified geometry fails coverage. `container` may contain other content, `essential` is a protected collision region, `connector` is sampled for clearance, and `decorative` is containment/visibility evidence only.
+
+The audit requires exact coverage of primary labels, custom text, classified visible custom geometry, and promoted relation connectors. It checks visibility, owner/viewport containment, minimum custom-text padding, browser font readiness/platform-font glyph attribution, text-to-text overlap, text-to-protected-mark overlap, and connector clearance through text/protected regions.
+
+Promote with `--promote --out <visual-audit-evidence.json>`; retain raw observation with `--observation-out` when needed. A pass certifies only the declared audit scope for the exact promoted render and browser environment. It does not grant the browser authority to repair layout or visual structure.
 
 ## Browser text review and promotion
 
-Run browser text review after the matching document and rendered SVG have promoted and before visual review is considered complete:
+Run browser text review after the matching document and rendered SVG have promoted and before final visual review is considered complete:
 
 ```bash
 node <skill-root>/scripts/browser-text.mjs \
@@ -96,7 +118,7 @@ Repair `TXT` failures at their source-copy, typography, primitive measurement, p
 
 ## Multi-target document packaging
 
-Use multi-target packaging only after deciding that one delivery must contain two or more real target authorities. Do not create a "mobile" target by scaling a desktop target.
+Use multi-target packaging only after deciding that one delivery must contain two or more real target authorities. Do not create a target by scaling a different target.
 
 A package request supplies at least two inline layout targets. The package CLI reruns the complete target-specific chain independently for every entry. The target profile may differ from the base FigureSpec profile; the CLI changes only profile selection before semantic promotion and verifies that all packaged children preserve the same semantic figure content apart from profile.
 
@@ -110,7 +132,7 @@ Each target gets its own profile plan, resolved layout, rendered SVG, optional m
 
 The resulting `DocumentPackage` binds exact child document hashes and embeds their exact HTML bytes. The package runtime may select among embedded targets but may not recompute geometry, synthesize missing targets, or use CSS geometry scaling. A host viewport smaller than a target scrolls the exact target rather than silently shrinking it.
 
-Use `window.FigthreadPackage.listTargets()` and `activateTarget(id)` only as view selection over already promoted child documents. If one target fails layout, browser text evidence, motion, or document promotion, repair that target upstream before packaging.
+Use `window.FigthreadPackage.listTargets()` and `activateTarget(id)` only as view selection over already promoted child documents. If one target fails layout, browser visual audit, browser text evidence, motion, or document promotion, repair that target upstream before packaging.
 
 ## Export derivatives and promotion
 
@@ -134,6 +156,7 @@ Multi-target package HTML is a delivery container of independently promoted docu
 - The profile registry and `ProfilePlan` own readability floors, density budgets, effective measurements, target constraints, and motion envelopes.
 - `LayoutIntent` owns layout intent; `ResolvedLayout` alone owns actual boxes, anchors, and connector geometry.
 - The renderer owns deterministic SVG serialization and serialized rendered-profile evidence, not semantic or geometry reinterpretation.
+- Browser visual audit planning, observation, and evidence bind browser-resolved text/custom-geometry/connector facts without owning copy, primitive structure, or geometry.
 - `MotionSpec` owns semantic timing/effects/cues; `MotionProgram` owns deterministic compiled tracks resolved against promoted layout.
 - The document manifest binds canonical input hashes to compiled authority hashes and the exact self-contained single-target runtime build.
 - `BrowserTextPlan`, browser observation, and `BrowserTextEvidence` bind and certify browser-shaped text facts without owning copy or geometry.
@@ -164,12 +187,13 @@ Multi-target package HTML is a delivery container of independently promoted docu
 - Radial layout must preserve the registered semantic hub/ring topology and composition order; it may not switch to stochastic placement when space is tight.
 - Static rendering uses the declared semantic summary snapshot, never an arbitrary animation frame.
 - Color cannot be the sole discriminator for explanatory meaning.
-- Browser text evidence may reject promoted geometry or copy but may never mutate either.
+- Browser visual audit and browser text evidence may reject promoted geometry or copy but may never mutate either.
+- Custom visible geometry that is in visual-audit scope must be classified or fail closed; custom text is always audited.
 - Motion contains no executable callbacks or canonical resolved geometry; repeat motion explicitly restores initial semantic state.
 - Generated HTML is self-contained and performs no external runtime I/O.
 - A multi-target package contains exact independently promoted child targets; CSS transform scaling is not a target authoring method.
 - Package target switching is view state, not a new layout authority.
-- Static, print, reduced-motion, and default SVG export use semantic summary state.
+- Static, reduced-motion, and default SVG export use semantic summary state.
 - PNG is captured from exact promoted HTML; capture projection may remove host scaling but may not recalculate or rewrite promoted geometry.
 - PNG artifacts bind browser/platform-font environment evidence; cross-platform screenshot binary identity is not claimed.
 - Draft mode is non-authoritative. Only gate promotion unlocks downstream authority.
@@ -178,6 +202,6 @@ Multi-target package HTML is a delivery container of independently promoted docu
 
 ## Current runtime capabilities
 
-The installed runtime supports semantic, grammar, primitive, profile, deterministic left-right/top-down layout, topology-specific deterministic radial ring/hub layout, static SVG, browser-resolved glyph-bound and platform-font evidence through a bundled Chrome/Chromium DevTools adapter, semantic motion, self-contained single-target HTML, self-contained multi-target HTML packages built from exact promoted child documents, HTML/SVG single-target export, bundled Chrome/Chromium PNG capture with environment-bound promotion evidence, and resumable evidence-bound execution.
+The installed runtime supports semantic, grammar, primitive, profile, deterministic left-right/top-down layout, topology-specific deterministic radial ring/hub layout, static SVG, browser-resolved full-SVG visual audit for all rendered text plus classified custom geometry and relation connectors, browser-resolved glyph-bound and platform-font evidence through a bundled Chrome/Chromium DevTools adapter, semantic motion, self-contained single-target HTML, self-contained multi-target HTML packages built from exact promoted child documents, HTML/SVG single-target export, bundled Chrome/Chromium PNG capture with environment-bound promotion evidence, and resumable evidence-bound execution.
 
 Generic force-directed graphs and automatic multi-ring radial packing remain outside the runtime. Keep those limitations explicit.
