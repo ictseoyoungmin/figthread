@@ -1,13 +1,15 @@
 {
   "name": "figthread",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "private": true,
-  "description": "Semantic figure authoring with promoted visual/profile/layout authority, deterministic SVG rendering, rendered-profile evidence, and semantic motion.",
+  "description": "Semantic figure authoring with promoted grammar, visual, profile, layout, deterministic SVG rendering, rendered-profile evidence, and semantic motion.",
   "type": "module",
   "scripts": {
     "test": "node --test",
     "validate": "node skills/figthread/scripts/validate.mjs",
     "validate:promote": "node skills/figthread/scripts/validate.mjs --promote",
+    "grammar": "node skills/figthread/scripts/grammar.mjs",
+    "grammar:promote": "node skills/figthread/scripts/grammar.mjs --promote",
     "visual": "node skills/figthread/scripts/visual.mjs",
     "visual:promote": "node skills/figthread/scripts/visual.mjs --promote",
     "profile": "node skills/figthread/scripts/profile.mjs",

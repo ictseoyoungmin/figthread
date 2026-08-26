@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://figthread.dev/schemas/grammar-plan/0.1",
+  "title": "Figthread GrammarPlan 0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version","figure_hash","registry_hash","definition_hash","grammar_id","variant","primary_axis","reading_order","role_bindings","topology","split","layout","engine_version","plan_hash"],
+  "properties": {
+    "schema_version": {"const":"figthread.grammar-plan/0.1"},
+    "figure_hash": {"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},
+    "registry_hash": {"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},
+    "definition_hash": {"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},
+    "grammar_id": {"type":"string","enum":["comparison","architecture","pipeline","mechanism","state-transition","timeline","network","hierarchy","swimlane","lifecycle","dataflow","multi-panel"]},
+    "variant": {"type":"string","minLength":1},
+    "primary_axis": {"type":"string","enum":["x","y","radial"]},
+    "reading_order": {"type":"array","items":{"type":"string","pattern":"^node:[a-z0-9][a-z0-9._-]*$"}},
+    "role_bindings": {"type":"object"},
+    "topology": {"type":"object"},
+    "split": {"type":"object"},
+    "layout": {"type":"object"},
+    "engine_version": {"type":"string","minLength":1},
+    "plan_hash": {"type":"string","pattern":"^sha256:[0-9a-f]{64}$"}
+  }
+}

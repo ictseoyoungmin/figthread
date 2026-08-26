@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.7.0 — D-007 canonical figure grammar
+
+- added a content-hashed twelve-grammar registry covering comparison, architecture, pipeline, mechanism, state-transition, timeline, network, hierarchy, swimlane, lifecycle, dataflow, and multi-panel
+- added GrammarPlan validation/promotion with immutable receipt and deterministic registry/definition/plan hashes
+- made grammar roles ordered semantic node bindings with registered cardinalities, variants, axes, relation vocabularies, topology policy, and split caps
+- added pipeline cycle/branch/merge/direct-flow checks, mechanism feedback validation, state-transition state/trigger checks, network isolation checks, hierarchy parent/root/connectivity checks, swimlane ownership checks, lifecycle closure, dataflow role/provenance checks, and multi-panel composition rules
+- added hybrid relation detection and explicit GRM diagnostics instead of allowing renderer/layout compensation
+- bound grammar registry, selected definition, and GrammarPlan identity into LayoutIntent, ResolvedLayout, and layout promotion receipts
+- routed layout, render, and motion CLIs through explicit grammar promotion
+- added skill-local grammar CLI/reference/schema, root mirrors, CI commands, and twelve-grammar regression fixtures
+- extended agent-facing guards so GrammarPlan/GrammarDefinition contract versions stay out of public prose
+
 ## 0.6.0 — D-006 deterministic static SVG rendering
 
 - added a deterministic standalone SVG renderer that consumes only promoted semantic, primitive, profile, and layout authority

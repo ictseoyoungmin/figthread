@@ -10,7 +10,7 @@ description: >-
 
 Figure first, motion second.
 
-Semantic figure state must be validated and promoted before visual binding. Visual binding must be validated and promoted before a profile may strengthen readability and density constraints. A promoted profile plan must exist before layout treats measurements or target spacing as authoritative. Deterministic layout must be validated and promoted before rendering or motion treats geometry as authoritative. Static rendering must consume the promoted semantic summary snapshot and audit the SVG it actually emitted. Semantic motion must satisfy both the selected profile envelope and semantic motion validation before a runtime treats animation tracks as authoritative. Do not bypass an upstream promotion gate.
+Semantic figure state must be validated and promoted before grammar, visual, profile, layout, render, or motion work may depend on it. One canonical figure grammar must then be validated and promoted before layout treats reading order, topology, or composition rules as authoritative. Visual binding must be validated and promoted before a profile may strengthen readability and density constraints. A promoted profile plan must exist before layout treats measurements or target spacing as authoritative. Deterministic layout must be validated and promoted before rendering or motion treats geometry as authoritative. Static rendering must consume the promoted semantic summary snapshot and audit the SVG it actually emitted. Semantic motion must satisfy both the selected profile envelope and semantic motion validation before a runtime treats animation tracks as authoritative. Do not bypass an upstream promotion gate.
 
 ## Required reading
 
@@ -19,6 +19,11 @@ Before semantic authoring, read:
 1. `references/figure-ir.md`
 2. `schemas/figure-spec.schema.json`
 3. `templates/figure-spec.json`
+
+Before grammar resolution, also read:
+
+1. `references/figure-grammar.md`
+2. `grammars/registry.json`
 
 Before visual binding, also read:
 
@@ -57,6 +62,17 @@ When motion adds explanatory value, also read:
 5. Run the same command with `--promote`.
 6. Treat only the promoted `validated_figure` as semantic authority downstream.
 
+## Grammar resolution and promotion
+
+1. Start from a promoted `validated_figure`.
+2. Choose exactly one root grammar from the installed registry according to the reader's primary question.
+3. Bind the grammar's required semantic roles to ordered node IDs in `composition.grammar.role_bindings`.
+4. Choose only a registered variant and reading axis. Do not invent a hybrid layout when a split or multi-panel figure is required.
+5. Run `node <skill-root>/scripts/grammar.mjs <figure-spec.json> --mode gate`.
+6. Repair `GRM` failures at their type, role, cardinality, relation, order, cycle, composition, split, or hybrid cause.
+7. Promote with the same command and `--promote`.
+8. Treat only the promoted `GrammarPlan` as grammar authority for layout.
+
 ## Visual binding and promotion
 
 1. Start from a promoted `validated_figure`.
@@ -80,15 +96,15 @@ When motion adds explanatory value, also read:
 
 ## Deterministic layout and promotion
 
-1. Start from matching promoted semantic, primitive, and profile artifacts; never supply hand-authored node measurements to the agent-facing layout workflow.
+1. Start from matching promoted semantic, grammar, primitive, and profile artifacts; never supply hand-authored node measurements to the agent-facing layout workflow.
 2. Run `node <skill-root>/scripts/layout.mjs <figure-spec.json> <visual-spec.json> <layout-target.json> --mode gate`.
-3. Repair `LAY` failures at their layout, profile, visual, or upstream semantic cause; do not compensate with downstream CSS patches.
+3. Repair `LAY` failures at their layout, grammar, profile, visual, or upstream semantic cause; do not compensate with downstream CSS patches.
 4. Promote with the same command and `--promote`.
 5. Treat only the promoted `ResolvedLayout` as geometry authority.
 
 ## Static SVG rendering and promotion
 
-1. Start from matching promoted semantic, primitive, profile, and layout artifacts.
+1. Start from matching promoted semantic, grammar, primitive, profile, and layout artifacts.
 2. Run `node <skill-root>/scripts/render.mjs <figure-spec.json> <visual-spec.json> <layout-target.json> --mode gate`.
 3. Repair `RND` failures at their semantic-state, primitive, profile-token, or layout owner. Do not hand-edit the generated SVG to make the render pass.
 4. Promote with the same command and `--promote`; use `--out <figure.svg>` and `--evidence <evidence.json>` when file output is required.
@@ -100,7 +116,7 @@ When motion adds explanatory value, also read:
 
 Use motion only when it explains sequence, transfer, propagation, state change, accumulation, routing, or comparison more clearly than the static figure alone.
 
-1. Start from matching promoted semantic, primitive, profile, and layout artifacts.
+1. Start from matching promoted semantic, grammar, primitive, profile, and layout artifacts.
 2. Author `MotionSpec` with integer-millisecond beats, semantic state effects, and semantic cues. Do not author coordinates, SVG paths, CSS keyframes, or DOM callbacks.
 3. Run `node <skill-root>/scripts/motion.mjs <figure-spec.json> <visual-spec.json> <layout-target.json> <motion-spec.json> --mode gate`.
 4. Repair `PRF` motion-envelope failures before repairing downstream `MOT` failures.
@@ -112,24 +128,31 @@ Use motion only when it explains sequence, transfer, propagation, state change, 
 ## Authority model
 
 - `FigureSpec` owns meaning and semantic state domains.
+- The grammar registry owns the canonical root grammar set, variants, required roles, topology policy, and split caps.
+- `GrammarPlan` owns the promoted root grammar, variant, semantic role bindings, reading order, topology policy, and grammar identity consumed by layout.
 - `VisualSpec` owns node-to-primitive binding, primitive variant, salience, props, and state-channel binding.
 - `PrimitiveDefinition` owns local intrinsic size, ports, slots, state channels, visual tokens, and custom local SVG when present.
 - `PrimitivePlan` owns resolved primitive bindings and primitive intrinsic measurements.
 - The profile registry owns readability floors, density budgets, target constraints, and motion envelopes.
 - `ProfilePlan` owns the selected threshold identity, density result, profile-strengthened measurements, and effective target spacing.
-- `LayoutIntent` owns target, regions, constraints, ports, and routing policy.
+- `LayoutIntent` owns target, regions, constraints, ports, routing policy, and the promoted grammar identity it compiles from.
 - `ResolvedLayout` owns actual boxes, anchors, and connector geometry.
 - The static SVG renderer owns deterministic SVG serialization, core primitive drawing implementation, profile-safe visual tokens, and rendered-profile evidence; it may not change promoted geometry or semantics.
 - `MotionSpec` owns semantic timing, state effects, and cues, but no resolved geometry.
 - `MotionProgram` owns deterministic compiled tracks whose geometry is resolved from `ResolvedLayout`.
 - Semantic relations remain in `FigureSpec`; the router chooses anchors and paths only after boxes freeze.
 - Browser or CSS auto-layout is never canonical geometry.
-- View/runtime state must not silently mutate promoted semantic, visual, profile, layout, render, or motion state.
+- View/runtime state must not silently mutate promoted semantic, grammar, visual, profile, layout, render, or motion state.
 
 ## Non-negotiables
 
+- Every figure has exactly one promoted root grammar before layout promotion.
+- Grammar role bindings contain node references only and must satisfy the selected grammar's required cardinalities.
+- Layout identity must bind the grammar registry, selected definition, and promoted grammar-plan hashes.
+- A grammar topology violation must be repaired semantically; routing cannot hide cycles, disconnected roles, invalid lane ownership, or cross-panel semantics.
+- If the explanation substantially requires a second root grammar, reclassify, multi-panel, or split instead of inventing a hybrid geometry.
 - Every semantic node has exactly one visual binding before profile/layout promotion.
-- Core primitive and profile registry identities are hash-verified; do not silently substitute different definitions.
+- Core primitive, grammar, and profile registry identities are hash-verified; do not silently substitute different definitions.
 - Thesis-bearing or novel salience requires a custom primitive.
 - Custom SVG definitions may not contain scripts, event handlers, foreign objects, or external references.
 - Primitive minimum intrinsic dimensions are hard floors.
@@ -144,8 +167,8 @@ Use motion only when it explains sequence, transfer, propagation, state change, 
 - Render evidence is content-hashed and must fail on emitted font/stroke/contrast/grayscale/purity violations that the installed renderer claims to certify.
 - Color must not be the sole visual discriminator for emphasis or state.
 - `MotionSpec` must not contain resolved geometry or executable callbacks.
-- Same promoted figure + primitive plan + profile plan + engine version must produce the same layout hash.
-- Same promoted semantic/visual/profile/layout authorities + render engine version must produce the same SVG/render hashes.
+- Same promoted figure + grammar plan + primitive plan + profile plan + engine version must produce the same layout hash.
+- Same promoted semantic/grammar/visual/profile/layout authorities + render engine version must produce the same SVG/render hashes.
 - Same promoted figure + promoted layout + canonical motion input + motion engine version must produce the same motion program hash.
 - Force-directed and stochastic layout are not allowed fallbacks.
 - Motion evaluation uses integer milliseconds and deterministic event ordering.
@@ -159,6 +182,6 @@ Use motion only when it explains sequence, transfer, propagation, state change, 
 
 ## Current runtime capabilities
 
-The installed runtime supports semantic validation, a hash-verified core primitive registry, custom primitive validation, a hash-verified five-profile threshold registry, deterministic profile-owned label/spacing refinement, semantic density gating, presentation safe-margin gating, profile motion-envelope validation, left-right/top-down layout with orthogonal routing, deterministic static SVG rendering for all bundled core primitive families, rendered SVG audits for explicit typography/stroke/contrast/grayscale/purity evidence, and deterministic semantic motion compilation/evaluation for state effects and `reveal`, `focus`, `transfer`, `trace`, and `morph-state` cues.
+The installed runtime supports semantic validation, a content-hashed twelve-grammar registry with role/topology/order/split validation, a hash-verified core primitive registry, custom primitive validation, a hash-verified five-profile threshold registry, deterministic profile-owned label/spacing refinement, semantic density gating, presentation safe-margin gating, profile motion-envelope validation, left-right/top-down layout with orthogonal routing, deterministic static SVG rendering for all bundled core primitive families, rendered SVG audits for explicit typography/stroke/contrast/grayscale/purity evidence, and deterministic semantic motion compilation/evaluation for state effects and `reveal`, `focus`, `transfer`, `trace`, and `morph-state` cues.
 
 Browser-resolved glyph extents and font fallback identity, topology-specific radial solving, animated HTML runtime composition, and final export packaging are not yet available. When one of those checks is required, fail closed or preserve it as explicit audit evidence rather than pretending the current deterministic renderer has proved it.

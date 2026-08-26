@@ -16,6 +16,8 @@ jobs:
       - run: npm test
       - run: npm run validate -- skills/figthread/examples/minimal.figure.json
       - run: npm run validate:promote -- skills/figthread/examples/minimal.figure.json
+      - run: npm run grammar -- skills/figthread/examples/minimal.figure.json
+      - run: npm run grammar:promote -- skills/figthread/examples/minimal.figure.json
       - run: npm run visual -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json
       - run: npm run visual:promote -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json
       - run: npm run profile -- skills/figthread/examples/minimal.figure.json skills/figthread/examples/minimal.visual.json skills/figthread/examples/minimal.layout-target.json
