@@ -102,7 +102,7 @@ test("feedback-loop mechanism uses the cycle solver rather than hub inference", 
 });
 
 test("radial minimum footprints fail closed when no legal ring fits", () => {
-  const { figure } = lifecycleFixture(), request = structuredClone(baseRequest); request.target.viewport = { width: 300, height: 260 }; request.measurements.push({ node_id: "node:review", min_w: 100, min_h: 60, pref_w: 140, pref_h: 80 });
+  const { figure } = lifecycleFixture(), request = structuredClone(baseRequest); request.target.viewport = { width: 240, height: 200 }; request.measurements.push({ node_id: "node:review", min_w: 100, min_h: 60, pref_w: 140, pref_h: 80 });
   const semantic = promoteFigureSpec(figure); assert.equal(semantic.promoted, true); const result = compilePromotedLayout(semantic, request);
   assert.equal(result.status, "fail"); assert.ok(result.issues.some((entry) => entry.code === "LAY001_UNSAT")); assert.equal(result.resolved_layout, undefined);
 });
