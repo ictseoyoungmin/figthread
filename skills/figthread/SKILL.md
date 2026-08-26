@@ -114,7 +114,15 @@ Use `window.FigthreadPackage.listTargets()` and `activateTarget(id)` only as vie
 
 ## Export derivatives and promotion
 
-Start from the promoted self-contained single-target document and matching rendered SVG. Author `ExportSpec`, gate with `export.mjs`, repair `EXP` failures at request/source/target/frame/vector/text/capture/purity owner, and treat only `ExportArtifact` as a certified derivative. HTML preserves exact promoted document bytes. Standalone SVG originates from promoted static SVG. PNG requires a conforming browser capture adapter and must fail closed if none is available.
+Start from the promoted self-contained single-target document and matching rendered SVG. Author `ExportSpec`, gate with `export.mjs`, repair `EXP` failures at request/source/target/frame/vector/text/capture/purity owner, and treat only `ExportArtifact` as a certified derivative. HTML preserves exact promoted document bytes. Standalone SVG originates from promoted static SVG.
+
+PNG promotion through the installed CLI uses the bundled Chrome/Chromium DevTools-pipe adapter automatically. It loads the exact promoted HTML without public-network navigation, prepares the requested static-summary or event-sourced time frame through `window.Figthread`, removes only host-page scaling/padding from the capture projection, applies only the requested export background override, captures the exact promoted SVG surface at the requested integer scale, and binds actual browser/platform-font evidence to the PNG artifact. Set `FIGTHREAD_CHROME` or pass `--browser <executable>` if browser discovery needs an explicit path. The low-level export runtime remains adapter-injected and must fail closed when no conforming adapter is supplied.
+
+```bash
+node <skill-root>/scripts/export.mjs \
+  <figure-spec.json> <visual-spec.json> <layout-target.json> [motion-spec.json] \
+  <png-export-spec.json> --promote --out figure.png --capture-plan capture-plan.json
+```
 
 Multi-target package HTML is a delivery container of independently promoted documents; do not pass it through the single-target export API as though it were one target. Export a selected child target through its own promoted document/render authority, or deliver the promoted package HTML itself.
 
@@ -130,7 +138,7 @@ Multi-target package HTML is a delivery container of independently promoted docu
 - The document manifest binds canonical input hashes to compiled authority hashes and the exact self-contained single-target runtime build.
 - `BrowserTextPlan`, browser observation, and `BrowserTextEvidence` bind and certify browser-shaped text facts without owning copy or geometry.
 - `DocumentPackage` owns target membership, target order/default selection, exact child document bytes/hashes, and package runtime selection policy. It owns no child geometry.
-- `ExportSpec`, `ExportPlan`, and `ExportArtifact` own derivative selection, source binding, and derivative bytes/evidence.
+- `ExportSpec`, `ExportPlan`, and `ExportArtifact` own derivative selection, source binding, and derivative bytes/evidence. The PNG capture adapter executes the plan but owns no semantic or layout authority.
 - The run manifest owns the active execution frontier and revision counters. Stage receipts own immutable evidence-bound history; checkpoints own resumable snapshots.
 - Browser/runtime/package/export projection state is ephemeral and may not be promoted upstream as semantic or geometry authority.
 
@@ -162,13 +170,14 @@ Multi-target package HTML is a delivery container of independently promoted docu
 - A multi-target package contains exact independently promoted child targets; CSS transform scaling is not a target authoring method.
 - Package target switching is view state, not a new layout authority.
 - Static, print, reduced-motion, and default SVG export use semantic summary state.
-- PNG is captured from promoted HTML; cross-platform screenshot binary identity is not claimed.
+- PNG is captured from exact promoted HTML; capture projection may remove host scaling but may not recalculate or rewrite promoted geometry.
+- PNG artifacts bind browser/platform-font environment evidence; cross-platform screenshot binary identity is not claimed.
 - Draft mode is non-authoritative. Only gate promotion unlocks downstream authority.
 - Resolve `<skill-root>` from this installed skill; do not substitute project npm wrappers for the skill-local protocol.
 - If a capability is unsupported, fail explicitly or reopen the appropriate upstream decision. Never fabricate a pass.
 
 ## Current runtime capabilities
 
-The installed runtime supports semantic, grammar, primitive, profile, deterministic left-right/top-down layout, topology-specific deterministic radial ring/hub layout, static SVG, browser-resolved glyph-bound and platform-font evidence through a bundled Chrome/Chromium DevTools adapter, semantic motion, self-contained single-target HTML, self-contained multi-target HTML packages built from exact promoted child documents, HTML/SVG single-target export, browser-capture planning for PNG, and resumable evidence-bound execution.
+The installed runtime supports semantic, grammar, primitive, profile, deterministic left-right/top-down layout, topology-specific deterministic radial ring/hub layout, static SVG, browser-resolved glyph-bound and platform-font evidence through a bundled Chrome/Chromium DevTools adapter, semantic motion, self-contained single-target HTML, self-contained multi-target HTML packages built from exact promoted child documents, HTML/SVG single-target export, bundled Chrome/Chromium PNG capture with environment-bound promotion evidence, and resumable evidence-bound execution.
 
-Generic force-directed graphs, automatic multi-ring radial packing, and an installed PNG capture adapter remain outside the runtime. Keep those limitations explicit.
+Generic force-directed graphs and automatic multi-ring radial packing remain outside the runtime. Keep those limitations explicit.
